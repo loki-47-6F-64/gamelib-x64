@@ -17,29 +17,21 @@ You should have received a copy of the GNU General Public License
 along with gamelib-x64. If not, see <http://www.gnu.org/licenses/>.
 */
 
-OUTPUT_FORMAT("binary")
+OUTPUT_FORMAT("elf64-x86-64")
 
 SECTIONS {
-	. = 0x7C00;
-	.bootloader : {
-		*(.bootstrap16);
-		*(.bootstrap16.data);
-		. = 0x1fe;
-		BYTE(0x55);
-		BYTE(0xaa);
-		_bootstrap_end = .;
-		*(.bootstrap17);
-		*(.bootstrap17*);
-		*(.bootstrap32);
-		*(.bootstrap32*);
-		*(.bootstrap64);
-		*(.bootstrap64*);
-		_bootloader_end = .;
-	}
+	. = 0x10000;
+  .text : { 
+    *(.text)
+  }
+  .data : { *(.data) }
+  .bss  : {
+    *(.bss) _system_end = .;
+  }
 
-	. = ASSERT(_bootstrap_end <= 0x7E00,"Bootstrap section too big! (>510 bytes)");
-	. = ASSERT(_bootloader_end <= 0x9FFF,"Bootloader section too big! (>8.5 kilobytes)");
-	. = ASSERT(_bootloader_end <= 0x8600,"Load more boot pages from disk (and then change this error)");
+
+	. = ASSERT(_system_end <= 0x20000,"Load more kernel pages from disk (and then change this error)");
+	. = ASSERT(_system_end <= 0x78400,"System initialization section too big! (>480 KB)");
 
 	/DISCARD/ : {
 		*(.debug_*)

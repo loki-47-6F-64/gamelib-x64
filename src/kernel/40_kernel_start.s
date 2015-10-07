@@ -21,7 +21,7 @@ along with gamelib-x64. If not, see <http://www.gnu.org/licenses/>.
 
 .file "src/kernel/40_kernel_start.s"
 
-.section .kernel.data
+.section .data
 largest_cpuid_str:	.asciz "Largest basic cpuid function number supported: %d\n"
 vendor_str:			.asciz "Vendor ID: %s\n"
 cpu_info_str:		.asciz "CPU type: %d, family: %d, model: %d, stepping: %d\n"
@@ -34,7 +34,7 @@ osvw_count_str:		.asciz "Hardware eratum known count: %u\n"
 
 OSVW_MSR0 = 0xC0010140
 
-.section .kernel
+.section .text
 	call _kernel_entry_point
 
 _kernel_entry_point:

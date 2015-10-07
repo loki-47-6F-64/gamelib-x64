@@ -22,9 +22,9 @@ along with gamelib-x64. If not, see <http://www.gnu.org/licenses/>.
 .global gameInit
 .global gameLoop
 
-.section .game.data
+.section .data
 
-.section .game.text
+.section .text
 
 gameInit:
 	ret

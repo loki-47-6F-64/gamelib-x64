@@ -21,7 +21,7 @@ along with gamelib-x64. If not, see <http://www.gnu.org/licenses/>.
 
 .file "src/kernel/memory.s"
 
-.section .kernel.data
+.section .data
 
 memory_init_str:		.asciz "* Initializing memory management subsystem...\n"
 memory_init_done_str:	.asciz "* Initializing memory management subsystem: done\n"
@@ -95,7 +95,7 @@ TOP_MEM2			= 0xC001001D
 # use invlpg instruction?
 .global init_memory
 
-.section .kernel
+.section .text
 
 init_memory:
 	enter	$0, $0

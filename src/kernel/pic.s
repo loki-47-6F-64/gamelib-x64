@@ -21,7 +21,7 @@ along with gamelib-x64. If not, see <http://www.gnu.org/licenses/>.
 
 .file "src/kernel/pic.s"
 
-.section .kernel.data
+.section .data
 PIC_init_str:				.asciz "* Initializing PIC subsystem...\n"
 PIC_init_done_str:			.asciz "* Initializing PIC subsystem: done\n"
 old_mask_str:				.asciz "old masks: %x, %x\n"
@@ -32,7 +32,7 @@ MASTER_DATA		= 0x21
 SLAVE_COMMAND	= 0xA0
 SLAVE_DATA		= 0xA1
 
-.section .kernel
+.section .text
 
 init_PIC:
 	enter	$0, $0

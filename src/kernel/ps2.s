@@ -21,7 +21,7 @@ along with gamelib-x64. If not, see <http://www.gnu.org/licenses/>.
 
 .file "src/kernel/ps2.s"
 
-.section .kernel.data
+.section .data
 ps2_init_str:		.asciz "* Initializing PS/2 subsystem...\n"
 ps2_init_done_str:	.asciz "* Initializing PS/2 subsystem: done\n"
 ps2_status_str:		.asciz "ps/2 status: %x\n"
@@ -41,7 +41,7 @@ code_set1:	.byte 0, 0, '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=
 			.byte 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 			.byte 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 
-.section .kernel
+.section .text
 
 init_ps2:
 	enter	$0, $0

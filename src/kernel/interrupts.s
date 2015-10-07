@@ -21,7 +21,7 @@ along with gamelib-x64. If not, see <http://www.gnu.org/licenses/>.
 
 .file "src/kernel/interrupts.s"
 
-.section .kernel.data
+.section .data
 interrupt_init_str:			.asciz "* Initializing interrupt handling subsystem...\n"
 interrupt_init_done_str:	.asciz "* Initializing interrupt handling subsystem: done\n"
 
@@ -55,7 +55,7 @@ idtr:
 	.word	4096	# full 256 interrupt table; 16 bytes per interrupt
 	.quad	IDT
 
-.section .kernel
+.section .text
 
 init_interrupts:
 	enter	$0, $0

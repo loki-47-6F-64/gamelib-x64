@@ -21,7 +21,7 @@ along with gamelib-x64. If not, see <http://www.gnu.org/licenses/>.
 .global putChar
 .global readKeyCode
 
-.section .kernel
+.section .text
 
 # void setTimer(int16 reloadValue)
 #

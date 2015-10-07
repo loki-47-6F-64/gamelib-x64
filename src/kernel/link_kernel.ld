@@ -17,17 +17,18 @@ You should have received a copy of the GNU General Public License
 along with gamelib-x64. If not, see <http://www.gnu.org/licenses/>.
 */
 
-OUTPUT_FORMAT("binary","binary","binary")
+OUTPUT_FORMAT("binary")
 
 SECTIONS {
 	. = 0x10000;
-	.kern : {
-		*(.kernel);
-		*(.kernel*);
-		*(.game*);
-		BYTE(0x42);
-		_system_end = .;
-	}
+  .text : { 
+    *(.text)
+  }
+  .data : { *(.data) }
+  .bss  : {
+    *(.bss) _system_end = .;
+  }
+
 
 	. = ASSERT(_system_end <= 0x20000,"Load more kernel pages from disk (and then change this error)");
 	. = ASSERT(_system_end <= 0x78400,"System initialization section too big! (>480 KB)");
