@@ -16,13 +16,21 @@ OBJCOPY = $(COMPPATH)/$(TARGET)objcopy
 RANLIB = $(COMPPATH)/$(TARGET)ranlib
 STRIP = $(COMPPATH)/$(TARGET)strip
 
+ifeq ($(DEBUG),1)
+	NDEBUG   := -O1 -g
+	PASS_MACRO_CC := -DNDEBUG=1
+	PASS_MACRO_AS := --defsym NDEBUG=1
+else
+	NRELEASE := -O3
+endif
+
 
 obj_boot   = out/boot.o
 obj_kernel = out/kernel.o
 obj_game   = out/game.o out/main.o
 
-ASFLAGS = -g
-CFLAGS  = -I$(PWD) -m64 -nostdlib -c -ffreestanding -mcmodel=large -mno-red-zone -mno-mmx -mno-sse -mno-sse2 -mno-sse3 -O0 -g -Wall -Wextra -W
+ASFLAGS = -g $(PASS_MACRO_AS)
+CFLAGS  = $(PASS_MACRO_CC) -I$(PWD) -m64 -nostdlib -c -ffreestanding -mcmodel=large -mno-red-zone -mno-mmx -mno-sse -mno-sse2 -mno-sse3 $(NDEBUG) $(NRELEASE) -Wall -Wextra -W
 
 
 all: out/kernel_symbols out/bootloader out/kernel Makefile
