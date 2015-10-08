@@ -24,6 +24,20 @@ To get started on developing your game, execute the following steps:
 
 To test your code, repeat steps 3 and 4  to compile and run your game.
 
+Debugging
+===========
+
+To get started on debugging your game based on gamelib-x64, you need to have gdb installed.
+
+ 1. Open a terminal and navigate to the root of the gamelib-x64 folder.
+ 2. Execute `make clean` if you already have executed `make` once.
+ 3. Execute `make DEBUG=1` to compile gamelib-x64 with debug symbols.
+ 4. Execute `make qemu-debug` to launch the compiled game in the Qemu emulator and allow gdb to attach to the game
+ 5. Execute `gdb` to start your debugger
+ 6. Start debugging.
+
+After modifying the source files, simply repeat steps 3 to 6.
+
 API
 ===========
 
