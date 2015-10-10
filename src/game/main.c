@@ -58,11 +58,7 @@ void print_snapshot(snapshot_t *snapshot) {
 
   char digit_buf[21];
   for(uint64_t x = 0; x < size; ++x) {
-    uint_to_hex(digit_buf, vals[x]);
-
-    write(&scr_regs, regs[x], 3, 0x07);
-    write(&scr_regs, " | 0x", 5, 0x07);
-    write(&scr_regs, digit_buf, 16, 0x07);
+    writef(&scr_regs, "%s | 0x%h", regs[x], vals[x]);
 
     // new line
     cursor_inc(&scr_regs);
@@ -76,17 +72,10 @@ void print_snapshot(snapshot_t *snapshot) {
 
   
   for(int32_t y = 0; y < (scr_addr.last.y - scr_addr.first.y); ++y) {
-    uint64_t size = uint_to_string(digit_buf, y << 3);
+    writef(&scr_addr, "%u", y << 3);
 
-    write(&scr_addr, digit_buf, size, 0x07);
-
-    uint_to_hex(digit_buf, snapshot->stack[y]);
-    write(&scr_stack, " | 0x", 5, 0x07);
-    write(&scr_stack, digit_buf, 16, 0x07);
-
-    uint64_t size_digits = int_to_string(digit_buf, snapshot->stack[y]);
-    write(&scr_stack, " | ", 3, 0x07);
-    write(&scr_stack, digit_buf, size_digits, 0x07);
+    uint64_t stack_val = snapshot->stack[y];
+    writef(&scr_stack, " | 0x%h | %u", stack_val, stack_val);
 
     // new line
     cursor_mov(&scr_addr, 0, 1);
@@ -126,7 +115,6 @@ void c_init() {
   screen_init(&scr_full, 0, 0, SCREEN_MAX_X, SCREEN_MAX_Y);
 
   PANIC;
-
  // write("Hello World!", 12, 0x0F);
 }
 

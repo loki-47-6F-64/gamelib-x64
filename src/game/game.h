@@ -15,5 +15,15 @@
  */
 void write(screen_t *scr, const void *buf, uint64_t count, uint8_t color);
 
+/**
+ * prints a formatted string.
+ * %d (int64_t)
+ * %u (uint64_t)
+ * %s (c-string)
+ * %% (print '%')
+ *
+ * format -- format string
+ */
+void writef(screen_t *scr, const char* format, ...);
 
 #endif

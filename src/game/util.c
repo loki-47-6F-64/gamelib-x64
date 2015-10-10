@@ -104,3 +104,29 @@ void uint_to_hex(char *out, uint64_t in) {
 
   reverse(out, 16);
 }
+
+
+/**
+ * str -- the string to return the size of
+ */
+uint64_t strlen(const char *str) {
+  uint64_t size = 0;
+  while(*str++) {
+    ++size;
+  }
+
+  return size;
+}
+
+/*
+ * copy null-terminated string from 'in' to 'out'
+ * 'out' will not be null-terminated
+ */
+uint64_t strcpy(char *out, const char *in) {
+  char *out_p = out;
+  while(*in) {
+    *out_p++ = *in++;
+  }
+
+  return out_p - out;
+}

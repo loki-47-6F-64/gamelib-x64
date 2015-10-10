@@ -49,5 +49,18 @@ void uint_to_hex(char *out, uint64_t in);
  */
 void fill(void *out, uint8_t val, uint64_t count);
 
+/**
+ * params:
+ *  str -- null-terminated c-string
+ * returns:
+ *  the length of the string
+ */
+uint64_t strlen(const char *str);
+
+/*
+ * copy null-terminated string from 'in' to 'out'
+ * 'out' will not be null-terminated
+ */
+uint64_t strcpy(char *out, const char *in);
 
 #endif
