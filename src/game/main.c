@@ -72,7 +72,7 @@ void print_snapshot(snapshot_t *snapshot) {
   screen_t scr_addr;
   screen_t scr_stack;
 
-  screen_init(&scr_msg, 29, 8, 49, 1);
+  screen_init(&scr_msg, 29, 8, 50, 1);
   screen_init(&scr_addr, 29, 9, 4, 16);
   screen_init(&scr_stack, 33, 9, 46, 16);
 
@@ -120,8 +120,7 @@ void c_init() {
   // wait_for_debugger();
   screen_init(&scr_full, 0, 0, SCREEN_SIZE_X, SCREEN_SIZE_Y);
 
-  assert(0, "W-W-What is h-happening?");
- // write("Hello World!", 12, 0x0F);
+  write(NULL, "Hello World!", 12, 0x0F);
 }
 
 void c_loop() {

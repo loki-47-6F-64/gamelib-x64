@@ -19,6 +19,8 @@ along with gamelib-x64. If not, see <http://www.gnu.org/licenses/>.
 
 .file "src/game/game.s"
 
+.include "src/game/debug_macro.s"
+
 .global gameInit
 .global gameLoop
 .global wait_for_debugger
@@ -39,7 +41,20 @@ wait_for_debugger:
   ret
 
 gameInit:
-  jmp c_init
+  pushq %rsp
+  movq %rsp, %rbp
+
+  call c_init
+  movq $-3, %r8
+  movq $-2, %r9
+
+  assert $-3, %r8, not_fail, je
+  assert %r8, %r9, fail, je
+
+  movq %rbp, %rsp
+  popq %rbp
+
+  ret
 
 gameLoop:
   jmp c_loop

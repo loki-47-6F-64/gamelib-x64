@@ -3,6 +3,7 @@
 
 #define _CONST_TO_STRING_HELPER( x ) # x
 #define CONST_TO_STRING( x ) _CONST_TO_STRING_HELPER( x )
+
 /**
  * prints state to screen and halts execution
  */
@@ -13,12 +14,12 @@
       : : "r"  ( x ))
 
 #ifdef NDEBUG
-  #define assert( x, y )\
+  #define assert( x )\
     if(!(x)) {\
-      PANIC( __FILE__ ":" CONST_TO_STRING(__LINE__) " | " y );\
+      PANIC( __FILE__ ":" CONST_TO_STRING(__LINE__));\
     }
 #else
-  #define assert( x, y ) do {} while(0);
+  #define assert( x ) do {} while(0);
 #endif
 
 

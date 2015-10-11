@@ -3,6 +3,9 @@
 
 #include "src/kernel/stdint.h"
 
+#define SCREEN_SIZE_X 80
+#define SCREEN_SIZE_Y 25
+
 typedef struct {
   int32_t x;
   int32_t y;
@@ -19,9 +22,6 @@ typedef struct {
   point_t last;
   point_t cursor;
 } screen_t;
-
-#define SCREEN_SIZE_X 80
-#define SCREEN_SIZE_Y 25
 
 screen_t scr_full;
 

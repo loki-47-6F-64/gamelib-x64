@@ -12,8 +12,11 @@
  *  non-zero on overflow of x or y
  */
 int64_t cursor_mov(screen_t *screen, int32_t x, int32_t y) {
+  assert(screen)
   const int32_t bound_x = screen->last.x - screen->first.x;
   const int32_t bound_y = screen->last.y - screen->first.y;
+
+  assert(bound_x <= SCREEN_SIZE_X && bound_y <= SCREEN_SIZE_Y);
 
   point_t *cursor = &screen->cursor;
 
@@ -59,8 +62,12 @@ int64_t cursor_mov(screen_t *screen, int32_t x, int32_t y) {
  *  0 otherwise
  */
 int cursor_inc(screen_t *screen) {
+  assert(screen)
+
   const int32_t bound_x = screen->last.x - screen->first.x;
   const int32_t bound_y = screen->last.y - screen->first.y;
+
+  assert(bound_x <= SCREEN_SIZE_X && bound_y <= SCREEN_SIZE_Y);
 
   point_t *cursor = &screen->cursor;
 
@@ -110,6 +117,9 @@ void screen_clear(screen_t *screen, int8_t color) {
  *  absolute x coordinate
  */
 int32_t screen_x(screen_t *scr) {
+  assert(scr)
+  assert(scr->cursor.x + scr->first.x <= SCREEN_SIZE_X);
+
   return scr->cursor.x + scr->first.x;
 }
 
@@ -120,6 +130,8 @@ int32_t screen_x(screen_t *scr) {
  *  absolute y coordinate
  */
 int32_t screen_y(screen_t *scr) {
+  assert(scr)
+  assert(scr->cursor.y + scr->first.y <= SCREEN_SIZE_Y);
   return scr->cursor.y + scr->first.y;
 }
 
@@ -133,6 +145,11 @@ int32_t screen_y(screen_t *scr) {
  *  height -- height of the screen
  */
 void screen_init(screen_t *scr, int32_t x, int32_t y, int32_t width, int32_t height) {
+  assert(scr)
+  assert(x >= 0 && y >= 0)
+  assert(width > 0 && height > 0)
+  assert((x + width <= SCREEN_SIZE_X) && (y + height <= SCREEN_SIZE_Y))
+
   point_t c = {0};
   point_t f = {x, y};
   point_t l = {x + width, y + height};
