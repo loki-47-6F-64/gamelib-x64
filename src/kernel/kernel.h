@@ -4,7 +4,11 @@
 /**
  * prints state to screen and halts execution
  */
-#define PANIC __asm__ volatile("jmp panic")
+#define PANIC( x ) \
+  __asm__ volatile(\
+      "pushq %0\n"\
+      "jmp panic"\
+      : : "r"  ( x ))
 
 #include "src/kernel/stdint.h"
 int64_t readKeyCode();

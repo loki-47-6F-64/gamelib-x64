@@ -25,13 +25,17 @@ typedef struct {
   uint64_t r13;
   uint64_t r14;
   uint64_t r15;
+  const char *message;
   const uint64_t stack[0];
 } __attribute__((packed)) snapshot_t;
 
 void print_snapshot(snapshot_t *snapshot) {
   screen_clear(&scr_full);
 
-  writef(&scr_full, "He%cl%clo%nWor%cld!", 0x01, 0x02, 0x47);
+  writef(NULL,
+      "This is a snapshot of the state of the game.%n"
+      "The game send the following message:%n"
+      "%s", snapshot->message);
 
   screen_t scr_regs;
   screen_init(&scr_regs, 2, 9, 24, 15);
@@ -56,13 +60,13 @@ void print_snapshot(snapshot_t *snapshot) {
   };
 
   uint64_t *vals = (uint64_t*)snapshot;
-  const uint64_t size = sizeof(snapshot_t) / 8;
+  const uint64_t size = sizeof(regs) / 8;
 
   for(uint64_t x = 0; x < size; ++x) {
-    writef(&scr_regs, "%s | 0x%h", regs[x], vals[x]);
+    writef(&scr_regs, "%s | 0x%h%n", regs[x], vals[x]);
 
     // new line
-    cursor_inc(&scr_regs);
+    // cursor_inc(&scr_regs);
   }
 
   screen_t scr_addr;
@@ -115,7 +119,7 @@ void c_init() {
   // wait_for_debugger();
   screen_init(&scr_full, 0, 0, SCREEN_MAX_X, SCREEN_MAX_Y);
 
-  PANIC;
+  PANIC("W-W-What is h-happening?");
  // write("Hello World!", 12, 0x0F);
 }
 
