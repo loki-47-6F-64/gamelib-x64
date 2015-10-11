@@ -120,7 +120,7 @@ void c_init() {
   // wait_for_debugger();
   screen_init(&scr_full, 0, 0, SCREEN_SIZE_X, SCREEN_SIZE_Y);
 
-  PANIC("W-W-What is h-happening?");
+  assert(0, "W-W-What is h-happening?");
  // write("Hello World!", 12, 0x0F);
 }
 

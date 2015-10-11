@@ -1,6 +1,8 @@
 #ifndef KERNEL_H
 #define KERNEL_H
 
+#define _CONST_TO_STRING_HELPER( x ) # x
+#define CONST_TO_STRING( x ) _CONST_TO_STRING_HELPER( x )
 /**
  * prints state to screen and halts execution
  */
@@ -9,6 +11,17 @@
       "pushq %0\n"\
       "jmp panic"\
       : : "r"  ( x ))
+
+#ifdef NDEBUG
+  #define assert( x, y )\
+    if(!(x)) {\
+      PANIC( __FILE__ ":" CONST_TO_STRING(__LINE__) " | " y );\
+    }
+#else
+  #define assert( x, y ) do {} while(0);
+#endif
+
+
 
 #include "src/kernel/stdint.h"
 int64_t readKeyCode();
