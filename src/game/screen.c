@@ -12,8 +12,8 @@
  *  non-zero on overflow of x or y
  */
 int64_t cursor_mov(screen_t *screen, int32_t x, int32_t y) {
-  const int32_t bound_x = screen->last.x - screen->first.x +1;
-  const int32_t bound_y = screen->last.y - screen->first.y +1;
+  const int32_t bound_x = screen->last.x - screen->first.x;
+  const int32_t bound_y = screen->last.y - screen->first.y;
 
   point_t *cursor = &screen->cursor;
 
@@ -59,8 +59,8 @@ int64_t cursor_mov(screen_t *screen, int32_t x, int32_t y) {
  *  0 otherwise
  */
 int cursor_inc(screen_t *screen) {
-  const int32_t bound_x = screen->last.x - screen->first.x +1;
-  const int32_t bound_y = screen->last.y - screen->first.y +1;
+  const int32_t bound_x = screen->last.x - screen->first.x;
+  const int32_t bound_y = screen->last.y - screen->first.y;
 
   point_t *cursor = &screen->cursor;
 
@@ -86,15 +86,20 @@ int cursor_inc(screen_t *screen) {
 
 /**
  * Makes the entire screen black
+ * params:
+ *  -- screen on NULL it is the entire screen
+ *  -- color the background color
  */
-void screen_clear(screen_t *screen) {
-  point_t *cursor = &screen->cursor;
+void screen_clear(screen_t *screen, int8_t color) {
+  if(!screen) {
+    screen = &scr_full;
+  }
 
-  cursor->x = 0;
-  cursor->y = 0;
+  screen->cursor.x = 0;
+  screen->cursor.y = 0;
 
   do {
-    putChar(cursor->x, cursor->y, ' ', 0x00);
+    putChar(screen_x(screen), screen_y(screen), ' ', color);
   } while(cursor_inc(screen) >= 0);
 }
 

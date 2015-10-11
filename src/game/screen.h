@@ -20,14 +20,18 @@ typedef struct {
   point_t cursor;
 } screen_t;
 
-#define SCREEN_MAX_X 79
-#define SCREEN_MAX_Y 24
+#define SCREEN_SIZE_X 80
+#define SCREEN_SIZE_Y 25
 
 screen_t scr_full;
+
 /**
  * Makes the entire screen black
+ * params:
+ *  -- screen on NULL it is the entire screen
+ *  -- color the background color
  */
-void screen_clear(screen_t *screen);
+void screen_clear(screen_t *screen, int8_t color);
 
 /**
  * increment cursor position

@@ -30,15 +30,12 @@ typedef struct {
 } __attribute__((packed)) snapshot_t;
 
 void print_snapshot(snapshot_t *snapshot) {
-  screen_clear(&scr_full);
+  screen_clear(NULL, 0x90);
 
-  writef(NULL,
+  writef(NULL, "%c"
       "This is a snapshot of the state of the game.%n"
       "The game send the following message:%n"
-      "%s", snapshot->message);
-
-  screen_t scr_regs;
-  screen_init(&scr_regs, 2, 9, 24, 15);
+      "%s", 0x9F, snapshot->message);
 
   char *regs[] = {
     "rax",
@@ -59,35 +56,39 @@ void print_snapshot(snapshot_t *snapshot) {
     "r15"
   };
 
+  screen_t scr_regs;
+  screen_init(&scr_regs, 2, 8, 24, 17);
+
   uint64_t *vals = (uint64_t*)snapshot;
   const uint64_t size = sizeof(regs) / 8;
 
+  screen_clear(&scr_regs, 0x10);
+  writef(&scr_regs, "%cThe registers:%n", 0x1F);
   for(uint64_t x = 0; x < size; ++x) {
-    writef(&scr_regs, "%s | 0x%h%n", regs[x], vals[x]);
-
-    // new line
-    // cursor_inc(&scr_regs);
+    writef(&scr_regs, "%c%s | 0x%h", 0x1F, regs[x], vals[x]);
   }
 
+  screen_t scr_msg;
   screen_t scr_addr;
   screen_t scr_stack;
 
-  screen_init(&scr_addr, 30, 9, 3, 16);
+  screen_init(&scr_msg, 29, 8, 49, 1);
+  screen_init(&scr_addr, 29, 9, 4, 16);
   screen_init(&scr_stack, 33, 9, 46, 16);
 
-  
+  screen_clear(&scr_msg, 0x10); 
+  screen_clear(&scr_addr, 0x10); 
+  screen_clear(&scr_stack, 0x10); 
+  writef(&scr_msg, "%cThe stack | (Hex and Integer)", 0x1F);
   for(int32_t y = 0; y < (scr_addr.last.y - scr_addr.first.y); ++y) {
-    writef(&scr_addr, "%u", y << 3);
+    writef(&scr_addr, "%c%u", 0x1F, y << 3);
 
     uint64_t stack_val = snapshot->stack[y];
-    writef(&scr_stack, " | 0x%h | %u", stack_val, stack_val);
+    writef(&scr_stack, "%c | 0x%h | %u%n", 0x1F, stack_val, stack_val);
 
     // new line
     cursor_mov(&scr_addr, 0, 1);
     scr_addr.cursor.x = 0;
-
-    cursor_mov(&scr_stack, 0, 1);
-    scr_stack.cursor.x = 0;
   }
 }
 
@@ -117,7 +118,7 @@ void write(screen_t *scr, const void *buf, uint64_t count, uint8_t color) {
  */
 void c_init() {
   // wait_for_debugger();
-  screen_init(&scr_full, 0, 0, SCREEN_MAX_X, SCREEN_MAX_Y);
+  screen_init(&scr_full, 0, 0, SCREEN_SIZE_X, SCREEN_SIZE_Y);
 
   PANIC("W-W-What is h-happening?");
  // write("Hello World!", 12, 0x0F);
