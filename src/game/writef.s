@@ -20,6 +20,22 @@
 .text
 
 .global writef
+
+# ret address stored in %r10
+writef_flush:
+  movq -8(%rbp), %rcx
+  movq %r14, %rdx
+  subq %rsp, %rdx
+  movq %rsp, %rsi # first char in 'container' is at the address in the stack pointer
+  movq %r12, %rdi
+
+  pushq %r10 # store ret pointer
+  call write # write(screen_t*, container, strlen(container))
+  popq %r10 # restore ret pointer
+
+  movq %rsp, %r14 # reset 'container_p'
+  jmp *%r10
+
 # This MUST only be called from writef
 # return:
 #   the next arg from the stack
@@ -40,8 +56,8 @@ writef_next_arg:
 
 writef_next_arg_if:
   inc %r13 # skip the 4th 'parameter'
-  ret
 
+  jmp *%r8
 # This MUST only be called from writef
 # params:
 #   0. (char) arg
@@ -58,6 +74,12 @@ writef_switch:
   cmpb $'s', %dil
   je writef_case_s
 
+  cmpb $'n', %dil
+  je writef_case_n
+
+  cmpb $'c', %dil
+  je writef_case_c
+
   cmpb $'%', %dil
   je writef_case_modulo
 
@@ -69,7 +91,7 @@ writef_switch:
   movb %r11b, (%r14) # *container = *format
   inc %r14
 
-  ret
+  jmp writef_endif
 
 writef_case_d:
   call writef_next_arg
@@ -79,7 +101,7 @@ writef_case_d:
   call int_to_string
   addq %rax, %r14 # 'container_p' += int_to_string('container_p', 'arg')
 
-  ret
+  jmp writef_endif
 
 writef_case_u:
   call writef_next_arg
@@ -89,7 +111,7 @@ writef_case_u:
   call uint_to_string
   addq %rax, %r14 # 'container_p' += uint_to_string('container_p', 'arg')
 
-  ret
+  jmp writef_endif
 
 writef_case_h:
   call writef_next_arg
@@ -97,9 +119,9 @@ writef_case_h:
   movq %r14, %rdi
   movq %rax, %rsi
   call uint_to_hex
-  addq %rax, %r14 # 'container_p' += uint_to_hex('container_p', 'arg')
+  addq $16, %r14 # 'container_p' += uint_to_hex('container_p', 'arg')
 
-  ret
+  jmp writef_endif
 
 writef_case_s:
   call writef_next_arg
@@ -109,15 +131,41 @@ writef_case_s:
   call strcpy
   addq %rax, %r14 # 'container_p' += strcpy('container_p', 'arg')
 
-  ret
+  jmp writef_endif
+
+writef_case_n:
+  movq $writef_case_n_ret, %r10
+  jmp writef_flush
+
+writef_case_n_ret:
+  movq %r12, %rdi
+  movq $0, %rsi
+  movq $1, %rdx
+  call cursor_mov # cursor_mov(screent_t*, 0, 1)
+
+  # screen_t->cursor.x = 0
+  movl $0, 16(%r12)
+
+  jmp writef_endif
+
+writef_case_c:
+  movq $writef_case_c_ret, %r10
+  jmp writef_flush
+
+writef_case_c_ret:
+  call writef_next_arg
+  movq %rax, -8(%rbp) # color = new_color
+  jmp writef_endif
 
 writef_case_modulo:
   movb $'%', (%r14)
   inc %r14 # *container++ = '%'
 
-  ret
+  jmp writef_endif
 
 # prints a formatted string.
+# %n (new-line)
+# %c (color)
 # %h (uint64_t) hex
 # %d (int64_t)
 # %u (uint64_t)
@@ -142,9 +190,15 @@ writef:
 
   pushq %rbp
   movq %rsp, %rbp
-  sub $1024, %rsp # char container[1024]
+  pushq $0x07 # temporary storage of color
+  subq $1024, %rsp # char container[1024]
 
+  cmpq $0, %rdi
   movq %rdi, %r12 # save 'screen_t*'
+  jne writef_screen_no_default # if(screent_t* != NULL)
+
+  movq $scr_full, %r12
+writef_screen_no_default:
   movq %rsi, %r15 # save 'format'
   movq %rsp, %r14 # 'container_p' = 'container'
   movq $0, %r13 # the amount of args read is zero
@@ -159,10 +213,9 @@ writef_loop:
 # writef_if:
   inc %r15
   movb (%r15), %dil 
-  call writef_switch # switch(*(++'format'))
+  jmp writef_switch # switch(*(++'format'))
 
-  jmp writef_endif
-
+  
 writef_else:
   movb (%r15), %r11b
   movb %r11b, (%r14) # *container = *format
@@ -173,18 +226,10 @@ writef_endif:
   
   jmp writef_loop
 writef_loop_break:
+  movq $writef_flush_ret, %r10
+  jmp writef_flush
 
-  movb $0, (%r14) # Make sure 'container' is null-terminated
-
-  movq %rsp, %rdi # first char in 'container' is at the address in the stack pointer
-  call strlen
-
-  movq $0x07, %rcx
-  movq %rax, %rdx
-  movq %rsp, %rsi # first char in 'container' is at the address in the stack pointer
-  movq %r12, %rdi
-
-  call write # write(screen_t*, container, strlen(container))
+writef_flush_ret:
 
   # retore stack
   movq %rbp, %rsp

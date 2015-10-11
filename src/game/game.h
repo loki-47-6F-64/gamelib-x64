@@ -17,6 +17,9 @@ void write(screen_t *scr, const void *buf, uint64_t count, uint8_t color);
 
 /**
  * prints a formatted string.
+ * %c (use new color)
+ * %n (new-line)
+ * %h (uint64_t) in hex
  * %d (int64_t)
  * %u (uint64_t)
  * %s (c-string)

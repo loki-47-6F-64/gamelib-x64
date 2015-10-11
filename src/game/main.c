@@ -31,6 +31,8 @@ typedef struct {
 void print_snapshot(snapshot_t *snapshot) {
   screen_clear(&scr_full);
 
+  writef(&scr_full, "He%cl%clo%nWor%cld!", 0x01, 0x02, 0x47);
+
   screen_t scr_regs;
   screen_init(&scr_regs, 2, 9, 24, 15);
 
@@ -56,7 +58,6 @@ void print_snapshot(snapshot_t *snapshot) {
   uint64_t *vals = (uint64_t*)snapshot;
   const uint64_t size = sizeof(snapshot_t) / 8;
 
-  char digit_buf[21];
   for(uint64_t x = 0; x < size; ++x) {
     writef(&scr_regs, "%s | 0x%h", regs[x], vals[x]);
 
