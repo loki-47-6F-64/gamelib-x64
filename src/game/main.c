@@ -367,7 +367,7 @@ void field_block_draw(field_t *field, block_t *block) {
   block_to_points(block_point, block);
 
   for(int x = 0; x < BLOCK_POINTS; ++x) {
-    int8_t color = 0x07;
+    int8_t color = 0x27;
 
     point_t *tmp = &block_point[x];
     // if field occupied
