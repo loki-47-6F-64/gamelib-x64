@@ -84,4 +84,15 @@ int32_t screen_x(screen_t *scr);
  */
 int32_t screen_y(screen_t *scr);
 
+/*
+ * Makes sure the point is within boundaries of the screen
+ * params:
+ *  screen -- the screen to use for normalization
+ *  p -- the point to normalize
+ *
+ * return:
+ *  non-zero on overflow of boundaries of (x or y)
+ */
+int32_t normalize(screen_t *screen, point_t *p);
+
 #endif

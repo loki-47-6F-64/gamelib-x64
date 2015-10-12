@@ -41,15 +41,10 @@ wait_for_debugger:
   ret
 
 gameInit:
-  pushq %rsp
+  pushq %rbp
   movq %rsp, %rbp
 
   call c_init
-  movq $-3, %r8
-  movq $-2, %r9
-
-  assert $-3, %r8, not_fail, je
-  assert %r8, %r9, fail, je
 
   movq %rbp, %rsp
   popq %rbp

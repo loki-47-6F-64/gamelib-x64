@@ -8,6 +8,8 @@
  * porting it to assembly. :p
  */
 
+game_t game;
+
 typedef struct {
   uint64_t rax;
   uint64_t rbx;
@@ -92,6 +94,74 @@ void print_snapshot(snapshot_t *snapshot) {
   }
 }
 
+/**
+ * Convert points in block to real points
+ * params:
+ *  in -- the points to put the result in
+ *  out -- the block
+ */
+void block_to_points(point_t *in, block_t *out) {
+  const int32_t max = BLOCK_POINTS -1;
+  for(int x = 0; x < BLOCK_POINTS; ++x) {
+    if(out->rotate) {
+      // With rotation x-axis and y-axis are swapped
+      in[x].x = out->point[x].y;
+      in[x].y = out->point[x].x;
+    }
+    else {
+      in[x].x = out->point[x].x;
+      in[x].y = out->point[x].y;
+    }
+
+    // A second rotation inverts x-axis and y-axis again,
+    // but it's mirrored relative to the original
+    if(out->mirror) {
+      //invert point
+      in[x].y = max - out->point[x].y;
+      in[x].y = max - out->point[x].y;
+    }
+    else {
+      in[x].x = out->point[x].x;
+      in[x].y = out->point[x].y;
+    }
+
+    // Normalize result
+    normalize(&scr_full, &in[x]);
+  }
+}
+
+/**
+ * Checks wether it is possible to place the block
+ * params
+ *  field -- the playing field
+ *  block -- the block that might overlap some other blocks or exceed bounds
+ * returns:
+ *    0 on false
+ */
+int field_empty(field_t *field, block_t *block) {
+  assert(field && block);
+
+  point_t block_point[BLOCK_POINTS];
+  block_to_points(block_point, block);
+
+  for(int x = 0; x < BLOCK_POINTS; ++x) {
+    point_t *tmp = &block_point[x];
+    // if field occupied
+    if(field->field[tmp->y][tmp->x]) {
+      return 0;
+    }
+
+    // if point out of bounds
+    if(
+      tmp->x >= field->bound_r.x || tmp->y >= field->bound_r.y ||
+      tmp->x <= field->bound_l.x || tmp->y <= field->bound_l.y)
+    {
+      return 0;
+    }
+  }
+
+  return 1;
+}
 
 /**
  * writes data to the screen
@@ -113,15 +183,269 @@ void write(screen_t *scr, const void *buf, uint64_t count, uint8_t color) {
   }
 }
 
+
+/**
+ * initialize the game
+ * params:
+ *  game -- the game to initialize
+ */
+void game_init(game_t *game) {
+  assert(game);
+
+  fill(game, 0, sizeof(game_t));
+
+  game->player = game->queue;
+  field_init(&game->field, 20, 1, 20, 20);
+
+  for(int x = 0; x < BLOCK_POINTS; ++x) {
+    block_next(&game->queue[x]);
+  }
+}
+
+uint64_t init = 0;
+
+uint64_t seed = 1234;
+uint64_t rand_next() {
+  uint64_t res = seed * seed;
+
+  // shave of the first two and last two digits
+  uint64_t div = 100;
+
+  // less than 8 digits
+  if(res < 10000000) {
+    div = 10;
+  }
+
+  // less than 7 digits
+  if(res < 1000000) {
+    div = 1;
+  }
+
+
+  res = (res / div) % 1000;
+
+  seed = res;
+  return res;
+}
+
 /**
  * initializes any global vars
  */
 void c_init() {
-  // wait_for_debugger();
-  screen_init(&scr_full, 0, 0, SCREEN_SIZE_X, SCREEN_SIZE_Y);
+  // 60HZ
+  setTimer(19886);
 
-  write(NULL, "Hello World!", 12, 0x0F);
+  screen_init(&scr_full, 0, 0, SCREEN_SIZE_X, SCREEN_SIZE_Y);
+  screen_clear(NULL, 0x00);
+
+  game_init(&game);
+
+  init = 1;
 }
 
 void c_loop() {
+  if(!init) return;
+
+  int64_t ascii = readKeyCode();
+
+  if(ascii) {
+    screen_clear(NULL, 0x00);
+    switch(ascii) {
+      case KEY_CODE_AU:
+        block_mov(game.player, 0, -1);
+        break;
+      case KEY_CODE_AD:
+        block_mov(game.player, 0, 1);
+        break;
+      case KEY_CODE_AL:
+        block_mov(game.player, -1, 0);
+        break;
+      case KEY_CODE_AR:
+        block_mov(game.player, 1, 0);
+        break;
+    }
+
+    game_draw(&game);
+  }
 }
+
+/**
+ * initializes a field.
+ * params:
+ *  field -- the field to init
+ *  x -- x-origin
+ *  y -- y-origin
+ *  wdith
+ *  height
+ */
+void field_init(field_t *field, int32_t x, int32_t y, int32_t width, int32_t height) {
+  assert(field)
+
+  assert(x >= 0 && y >= 0)
+  assert(width > 0 && height > 0)
+  assert((x + width <= SCREEN_SIZE_X) && (y + height <= SCREEN_SIZE_Y))
+
+
+  point_t l = { x, y };
+  point_t r = { x + width, y + height };
+
+  field->bound_l = l;
+  field->bound_r = r;
+  fill(field->field, 0, sizeof(field->field));
+}
+
+/**
+ * params:
+ *  block -- the block to move
+ *  x -- how much movement along x-axis
+ *  y -- how much movement along y-axis
+ */
+void block_mov(block_t *block, int32_t x, int32_t y) {
+  assert(block);
+
+//  // x-axis and y-axis are swapped
+//  if(block->rotate) {
+//    // swap x and y
+//    x ^= y;
+//    y ^= x;
+//    x ^= y;
+//  }
+
+  for(int z = 0; z < BLOCK_POINTS; ++z) {
+    block->point[z].x += x;
+    block->point[z].y += y;
+  }
+}
+
+/**
+ * Draw field on screen
+ * params:
+ *  field
+ */
+void field_draw(field_t *field) {
+  assert(field);
+
+
+  for(int x = field->bound_l.x; x <= field->bound_r.x; ++x) {
+    putChar(x, field->bound_l.y, '+', 0x7F);
+    putChar(x, field->bound_r.y, '+', 0x7F);
+  }
+
+  for(int y = field->bound_l.y; y <= field->bound_r.y; ++y) {
+    putChar(field->bound_l.x, y, '+', 0x7F);
+    putChar(field->bound_r.x, y, '+', 0x7F);
+  }
+
+  for(int y = 0; y < FIELD_SIZE_Y; ++y) {
+    for(int x = 0; x < FIELD_SIZE_X; ++x) {
+      // draw blocks
+      if(field->field[y][x]) {
+        putChar(x, y, '#', 0x07);
+      }
+    }
+  }
+}
+
+/**
+ * params:
+ *  game -- the game to draw
+ */
+void game_draw(game_t *game) {
+  field_draw(&game->field);
+  field_block_draw(&game->field, game->player);
+}
+
+/**
+ * params:
+ *  field -- the field
+ *  block -- the block to draw
+ */
+void field_block_draw(field_t *field, block_t *block) {
+  assert(block);
+
+  point_t block_point[BLOCK_POINTS];
+  block_to_points(block_point, block);
+
+  for(int x = 0; x < BLOCK_POINTS; ++x) {
+    int8_t color = 0x07;
+
+    point_t *tmp = &block_point[x];
+    // if field occupied
+    if(field->field[tmp->y][tmp->x]) {
+      color = 0xB7; // red background
+    }
+
+    // if point out of bounds
+    if(
+      tmp->x >= field->bound_r.x || tmp->y >= field->bound_r.y ||
+      tmp->x <= field->bound_l.x || tmp->y <= field->bound_l.y)
+    {
+      color = 0x67; // brown background
+    }
+
+    putChar(tmp->x, tmp->y, '#', color);
+  }
+}
+
+void block_square(block_t *block) {
+  point_t *p = block->point;
+
+  p[0].x = 1;
+  p[0].y = 1;
+
+  p[1].x = 2;
+  p[1].y = 2;
+
+  p[2].x = 1;
+  p[2].y = 2;
+
+  p[3].x = 2;
+  p[3].y = 1;
+}
+
+void block_pole(block_t *block) {
+}
+void block_hook(block_t *block) {
+}
+void block_stage(block_t *block) {
+  point_t *p = block->point;
+
+  p[0].x = 3;
+  p[0].y = 3;
+
+  p[1].x = 2;
+  p[1].y = 3;
+
+  p[2].x = 1;
+  p[2].y = 3;
+
+  p[3].x = 2;
+  p[3].y = 2;
+}
+
+/**
+ * puts random positions in the block
+ * params:
+ *  block -- the block that get initialized
+ */
+void block_next(block_t *block) {
+  assert(block);
+
+  uint64_t type = rand_next() % 4;
+  type = 3;
+  switch(type) {
+    case 0:
+      block_square(block);
+      break;
+    case 1:
+      block_pole(block);
+      break;
+    case 2:
+      block_hook(block);
+      break;
+    case 3:
+      block_stage(block);
+      break;
+  }
+}
+

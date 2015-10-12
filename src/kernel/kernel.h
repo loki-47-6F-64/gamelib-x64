@@ -22,11 +22,21 @@
   #define assert( x ) do {} while(0);
 #endif
 
+#define KEY_CODE_W 0x1D
+#define KEY_CODE_S 0x1B
+#define KEY_CODE_A 0x1C
+#define KEY_CODE_D 0x23
+
+#define KEY_CODE_AU 72
+#define KEY_CODE_AD 80
+#define KEY_CODE_AL 75
+#define KEY_CODE_AR 77
 
 
 #include "src/kernel/stdint.h"
 int64_t readKeyCode();
 void putChar(int8_t x, int8_t y, char ascii, int8_t color);
+void setTimer(int16_t reloadValue);
 
 /*
  * Simply hlt's the processor until the debugger nops the instructions
