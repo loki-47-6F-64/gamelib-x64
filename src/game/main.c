@@ -104,8 +104,9 @@ void block_to_points(point_t *in, block_t *out) {
   const int32_t max = BLOCK_POINTS -1;
   for(int x = 0; x < BLOCK_POINTS; ++x) {
     if(out->rotate) {
-      // With rotation x-axis and y-axis are swapped
-      in[x].x = out->point[x].y;
+      // With rotation y-axis becomes x-axis and
+      // the x-axis becomes the mirror of the y-axis
+      in[x].x = max - out->point[x].y;
       in[x].y = out->point[x].x;
     }
     else {
@@ -117,14 +118,12 @@ void block_to_points(point_t *in, block_t *out) {
     // but it's mirrored relative to the original
     if(out->mirror) {
       //invert point
-      in[x].y = max - out->point[x].y;
-      in[x].y = max - out->point[x].y;
-    }
-    else {
-      in[x].x = out->point[x].x;
-      in[x].y = out->point[x].y;
+      in[x].x = max - in[x].x;
+      in[x].y = max - in[x].y;
     }
 
+    in[x].x += out->origin.x;
+    in[x].y += out->origin.y;
     // Normalize result
     normalize(&scr_full, &in[x]);
   }
@@ -239,6 +238,8 @@ void c_init() {
   screen_clear(NULL, 0x00);
 
   game_init(&game);
+  game.player->origin.x = 0;
+  game.player->origin.y = 0;
 
   init = 1;
 }
@@ -250,6 +251,7 @@ void c_loop() {
 
   if(ascii) {
     screen_clear(NULL, 0x00);
+    writef(NULL, "KeyCode of key presses: %h", ascii);
     switch(ascii) {
       case KEY_CODE_AU:
         block_mov(game.player, 0, -1);
@@ -262,6 +264,9 @@ void c_loop() {
         break;
       case KEY_CODE_AR:
         block_mov(game.player, 1, 0);
+        break;
+      case KEY_CODE_S:
+        block_rotate(game.player);
         break;
     }
 
@@ -303,17 +308,26 @@ void field_init(field_t *field, int32_t x, int32_t y, int32_t width, int32_t hei
 void block_mov(block_t *block, int32_t x, int32_t y) {
   assert(block);
 
-//  // x-axis and y-axis are swapped
-//  if(block->rotate) {
-//    // swap x and y
-//    x ^= y;
-//    y ^= x;
-//    x ^= y;
-//  }
+  block->origin.x += x;
+  block->origin.y += y;
+}
 
-  for(int z = 0; z < BLOCK_POINTS; ++z) {
-    block->point[z].x += x;
-    block->point[z].y += y;
+/**
+ * (logically) rotates the block.
+ * params:
+ *  block -- the block to rotate
+ */
+void block_rotate(block_t *block) {
+  assert(block);
+
+  if(block->rotate) {
+    // complement mirror
+    block->mirror = 1 - block->mirror;
+
+    block->rotate = 0;
+  }
+  else {
+    block->rotate = 1;
   }
 }
 

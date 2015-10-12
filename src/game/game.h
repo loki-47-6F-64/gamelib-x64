@@ -18,6 +18,8 @@ typedef struct {
 } field_t;
 
 typedef struct {
+  point_t origin;
+
   point_t point[BLOCK_POINTS];
 
   // either 1 or 0
@@ -40,6 +42,13 @@ extern game_t game;
  *  out -- the block
  */
 void block_to_points(point_t *in, block_t *out);
+
+/**
+ * (logically) rotates the block.
+ * params:
+ *  block -- the block to rotate
+ */
+void block_rotate(block_t *block);
 
 /**
  * writes data to the screen
