@@ -11,11 +11,13 @@
 
 #define BLOCK_QUEUE_SIZE 4
 
-#define STATE_MENU          0
-#define STATE_GAME          1
-#define STATE_HIGHSCORE     2
-#define STATE_NEW_HIGHSCORE 3
+#define STATE_SUSPEND       0
+#define STATE_MENU          1
+#define STATE_GAME          2
+#define STATE_HIGHSCORE     3
+#define STATE_NEW_HIGHSCORE 4
 
+#define SCORE_SIZE 10
 typedef struct {
   screen_t screen;
 
@@ -40,10 +42,25 @@ typedef struct {
   field_t field;
   screen_t block_screen;
   uint64_t timer;
+  uint64_t score;
 } game_t;
+
+typedef struct {
+  char name[4]; // three chars and a null-byte
+  uint64_t score;
+} score_t;
+
+typedef struct {
+  char *name_p;
+  score_t *score;
+} new_highscore_t;
+
+extern score_t score[SCORE_SIZE];
+extern new_highscore_t new_highscore;
 
 extern game_t game;
 extern uint64_t game_state;
+
 /**
  * Convert points in block to real points
  * params:
@@ -119,10 +136,8 @@ void game_draw(game_t *game);
 
 /**
  * initialize the game
- * params:
- *  game -- the game to initialize
  */
-void game_init(game_t *game);
+void game_init();
 
 /**
  * like block_draw, but with color background on special purposes

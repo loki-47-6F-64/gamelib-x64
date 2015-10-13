@@ -8,9 +8,13 @@
  * porting it to assembly. :p
  */
 
+new_highscore_t new_highscore;
+score_t score[SCORE_SIZE];
 game_t game;
 
 uint64_t game_state;
+
+void highscore_init();
 
 /**
  * writes data to the screen
@@ -34,32 +38,70 @@ void write(screen_t *scr, const void *buf, uint64_t count, uint8_t color) {
 
 
 /**
- * initialize the game
+ * If it fits in the highscore, prepare the new highscore
  * params:
- *  game -- the game to initialize
+ *  score -- the new highscore
  */
-void game_init(game_t *game) {
-  assert(game);
+void new_highscore_init(uint64_t new_score) {
+  screen_clear(NULL, 0x00);
 
-  fill(game, 0, sizeof(game_t));
+  int x;
+  for(x = 0; x < SCORE_SIZE; ++x) {
+    if(new_score > score[x].score) {
+      break; // new highscore, and there is a spot
+    }
+  }
 
-  game->player = game->queue;
+  if(x == SCORE_SIZE) {
+    highscore_init();
+    return; // no new highscore
+  }
 
-  field_init(&game->field, 10, 6);
-  screen_init(&game->block_screen,
-      FIELD_SIZE_X + game->field.screen.first.x  +2,
+  // Insert new highscore
+  for(int y = SCORE_SIZE -1; y > x; --y) {
+    score[y] = score[y -1];
+  }
+
+  // prepare initial values of the name
+  char *name = score[x].name;
+  name[0] = 'A';
+  name[1] = 'A';
+  name[2] = 'A';
+  name[3] = '\0';
+
+  score[x].score = new_score;
+
+  new_highscore.score = &score[x];
+  new_highscore.name_p = name;
+
+  game_state = STATE_NEW_HIGHSCORE;
+}
+
+/**
+ * initialize the game
+ */
+void game_init() {
+  fill(&game, 0, sizeof(game_t));
+
+  game.player = game.queue;
+
+  field_init(&game.field, 10, 6);
+  screen_init(&game.block_screen,
+      FIELD_SIZE_X + game.field.screen.first.x  +2,
       4,
       5,
       BLOCK_POINTS *4 +1
   );
 
-  game_block_reset(game);
+  game_block_reset(&game);
 
   for(int x = 0; x < BLOCK_POINTS; ++x) {
-    block_next(&game->queue[x]);
+    block_next(&game.queue[x]);
   }
 
-  game->timer = 6 *TICKS_PER_SEC;
+  game.timer = 6 *TICKS_PER_SEC;
+
+  game_state = STATE_GAME;
 }
 
 uint64_t seed = 973;
@@ -82,15 +124,13 @@ uint64_t rand_next() {
 void c_game_loop() {
   int64_t ascii = readKeyCode();
 
-  screen_t scr_timer;
-  screen_init(&scr_timer, 0, 0, SCREEN_SIZE_X, 1);
+  screen_t scr_info;
+  screen_init(&scr_info, 0, 0, SCREEN_SIZE_X, 2);
 
   --game.timer;
   if(ascii) {
     screen_clear(NULL, 0x00);
 
-    cursor_mov(&scr_full, 25, 0);
-    writef(NULL, "KeyCode of key presses: %h", ascii);
     switch(ascii) {
       case KEY_CODE_AU:
         block_mov(game.player, 0, -1);
@@ -111,6 +151,7 @@ void c_game_loop() {
         if( game.player->dealloc ||
             field_empty(&game.field, game.player)
         ) {
+          ++game.score;
           field_block_merge(&game.field, game.player);
 
           game_next(&game); 
@@ -122,12 +163,18 @@ void c_game_loop() {
   }
 
   if(game.timer == 0) {
-    screen_clear(NULL, 0x00);
-    writef(NULL, "The application crashed...%nWhy did you abandon it? You monster!");
-    while(1);
+//    screen_clear(NULL, 0x00);
+//    writef(NULL, "The application crashed...%nWhy did you abandon it? You monster!");
+
+    new_highscore_init(game.score);
+
+    return;
   }
 
-  writef(&scr_timer, "Time left: %c%u%c seconds!", 0xC7, game.timer / TICKS_PER_SEC +1, 0x07);
+  writef(&scr_info,
+      "Time left: %c%u%c seconds!%n"
+      "Your current score: %c%u",
+      0xCF, game.timer / TICKS_PER_SEC +1, 0x07, 0x2F, game.score);
 }
 
 void c_menu_init() {
@@ -143,6 +190,26 @@ void c_menu_init() {
       0xCF, 0x07, 0x4F, 0x07, 0x4F
   );
 
+  game_state = STATE_MENU;
+}
+
+void highscore_init() {
+  screen_clear(NULL, 0x00);
+
+  screen_t scr_score;
+  screen_init(&scr_score, 20, 5, 45, SCORE_SIZE + 2);
+
+  writef(&scr_score, "-- Hall of Shame --%n%n");
+  for(int x = 0; x < SCORE_SIZE; ++x) {
+    // Printed all scores
+    if(!score[x].score) {
+      break;
+    }
+
+    writef(&scr_score, "%s | %u%n", score[x].name, score[x].score);
+  }
+
+  game_state = STATE_HIGHSCORE;
 }
 
 void c_menu_loop() {
@@ -155,8 +222,10 @@ void c_menu_loop() {
   if(ascii) {
     switch(ascii) {
       case KEY_CODE_1:
-        game_init(&game);
-        game_state = STATE_GAME;
+        game_init();
+        break;
+      case KEY_CODE_2:
+        highscore_init();
         break;
     };
   }
@@ -165,13 +234,42 @@ void c_menu_loop() {
 void c_new_highscore_loop() {
   uint64_t ascii = readKeyCode();
 
+  screen_t scr_score;
+  screen_init(&scr_score, 20, 10, 45, 2);
+
+//  screen_clear(&scr_score, 0x00);
   if(ascii) {
     switch(ascii) {
       case KEY_CODE_AU:
+        ++*new_highscore.name_p;
         break;
       case KEY_CODE_AD:
+        --*new_highscore.name_p;
+        break;
+      case KEY_CODE_ENT:
+        ++new_highscore.name_p;
+
+        // Name entered
+        if(!*new_highscore.name_p) {
+          highscore_init();
+          return;
+        }
         break;
     }
+  }
+
+  writef(&scr_score,
+      "Your score: %c%u%c%n"
+      "Your name:  %c%s",
+      0x2F, new_highscore.score->score, 0x07, 0xC7, new_highscore.score->name
+  );
+}
+
+void highscore_loop() {
+  uint64_t ascii = readKeyCode();
+
+  if(ascii == KEY_CODE_ENT) {
+    c_menu_init();
   }
 }
 
@@ -184,7 +282,10 @@ void c_loop() {
       c_game_loop();
       break;
     case STATE_HIGHSCORE:
+      highscore_loop();
+      break;
     case STATE_NEW_HIGHSCORE:
+      c_new_highscore_loop();
       break;
   }
 }
