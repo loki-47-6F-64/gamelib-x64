@@ -27,7 +27,7 @@ endif
 
 obj_boot   = out/boot.o
 obj_kernel = out/kernel.o
-obj_game   = out/game.o out/main.o out/util.o out/screen.o out/panic.o
+obj_game   = out/game.o out/main.o out/util.o out/screen.o out/panic.o out/block.o out/field.o
 
 ASFLAGS = -g $(PASS_MACRO_AS)
 CFLAGS  = $(PASS_MACRO_CC) -I$(PWD) -std=c11 -m64 -nostdlib -c -fno-omit-frame-pointer -ffreestanding -mcmodel=large -mno-red-zone -mno-mmx -mno-sse -mno-sse2 -mno-sse3 $(NDEBUG) $(NRELEASE) -Wall -Wextra -W
@@ -60,6 +60,12 @@ out/game.o: src/game/*.s | out
 
 out/main.o: src/game/main.c | out
 	$(CC) $(CFLAGS) src/game/main.c -o $@ 
+
+out/block.o: src/game/block.c | out
+	$(CC) $(CFLAGS) src/game/block.c -o $@ 
+
+out/field.o: src/game/field.c | out
+	$(CC) $(CFLAGS) src/game/field.c -o $@ 
 
 out/panic.o: src/game/panic.c | out
 	$(CC) $(CFLAGS) src/game/panic.c -o $@ 

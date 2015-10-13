@@ -11,9 +11,10 @@
 
 #define BLOCK_QUEUE_SIZE 4
 
-#define STATE_MENU      0
-#define STATE_GAME      1
-#define STATE_HIGHSCORE 2
+#define STATE_MENU          0
+#define STATE_GAME          1
+#define STATE_HIGHSCORE     2
+#define STATE_NEW_HIGHSCORE 3
 
 typedef struct {
   screen_t screen;
@@ -173,5 +174,11 @@ void game_next(game_t *game);
  *  game -- the game
  */
 void game_block_reset(game_t *game);
+
+extern uint64_t seed;
+/*
+ * rng based on: wiki https://en.wikipedia.org/wiki/Linear_congruential_generator
+ */
+uint64_t rand_next();
 
 #endif
