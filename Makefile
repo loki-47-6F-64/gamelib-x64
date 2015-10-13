@@ -30,7 +30,7 @@ obj_kernel = out/kernel.o
 obj_game   = out/game.o out/main.o
 
 ASFLAGS = -g $(PASS_MACRO_AS)
-CFLAGS  = $(PASS_MACRO_CC) -I$(PWD) -m64 -nostdlib -c -ffreestanding -mcmodel=large -mno-red-zone -mno-mmx -mno-sse -mno-sse2 -mno-sse3 $(NDEBUG) $(NRELEASE) -Wall -Wextra -W
+CFLAGS  = $(PASS_MACRO_CC) -I$(PWD) -m64 -nostdlib -c -fno-omit-frame-pointer -ffreestanding -mcmodel=large -mno-red-zone -mno-mmx -mno-sse -mno-sse2 -mno-sse3 $(NDEBUG) $(NRELEASE) -Wall -Wextra -W
 
 
 all: out/kernel_symbols out/bootloader out/kernel Makefile

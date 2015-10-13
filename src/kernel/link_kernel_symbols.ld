@@ -28,5 +28,15 @@ SECTIONS {
   .bss  : {
     *(.bss) _system_end = .;
   }
+
+  	/DISCARD/ : {
+		*(.note*)
+		*(.indent)
+		*(.comment)
+		*(.stab)
+		*(.stabstr)
+		*(.eh_frame)
+		*(.eh_frame_hdr)
+	}
 }
 
