@@ -32,6 +32,7 @@ typedef struct {
   block_t queue[BLOCK_QUEUE_SIZE];
 
   field_t field;
+  screen_t block_screen;
 } game_t;
 
 extern game_t game;
@@ -125,9 +126,10 @@ void field_block_draw(field_t *field, block_t *block);
 
 /**
  * params:
- *  block -- the block to draw
+ *  block  -- the block to draw
+ *  screen -- the screen to draw on
  */
-void block_draw(block_t *block);
+void block_draw(screen_t *screen, block_t *block);
 
 /**
  * params:

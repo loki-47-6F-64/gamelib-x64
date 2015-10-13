@@ -189,7 +189,22 @@ void game_init(game_t *game) {
   fill(game, 0, sizeof(game_t));
 
   game->player = game->queue;
+
   field_init(&game->field, 10, 1);
+  screen_init(&game->block_screen,
+      FIELD_SIZE_X + game->field.screen.first.x  +2,
+      4,
+      10,
+      BLOCK_POINTS *4 +1
+  );
+
+  for(int x = 0; x < BLOCK_QUEUE_SIZE; ++x) {
+    point_t *tmp = &game->queue[x].origin;
+
+    tmp->x = 0;
+    tmp->y = (x << 2); // x *4
+  }
+
 
   for(int x = 0; x < BLOCK_POINTS; ++x) {
     block_next(&game->queue[x]);
@@ -233,8 +248,6 @@ void c_init() {
   screen_clear(NULL, 0x00);
 
   game_init(&game);
-  game.player->origin.x = 0;
-  game.player->origin.y = 0;
 
   init = 1;
 }
@@ -266,6 +279,8 @@ void c_loop() {
       case KEY_CODE_ENT:
         if(field_empty(&game.field, game.player)) {
           field_block_merge(&game.field, game.player);
+
+          
         }
         break;
     }
@@ -369,7 +384,9 @@ void game_draw(game_t *game) {
   field_draw(&game->field);
 
   for(int x = 0; x < BLOCK_QUEUE_SIZE; ++x) {
-    block_draw(&game->queue[x]);
+    if(game->player != (game->queue + x)) {
+      block_draw(&game->block_screen, &game->queue[x]);
+    }
   }
 
   field_block_draw(&game->field, game->player);
@@ -377,19 +394,19 @@ void game_draw(game_t *game) {
 
 /**
  * params:
- *  block -- the block to draw
+ *  block  -- the block to draw
+ *  screen -- the screen to draw on
  */
-void block_draw(block_t *block) {
-  assert(block);
+void block_draw(screen_t *screen, block_t *block) {
+  assert(screen && block);
 
-  return;
   point_t block_point[BLOCK_POINTS];
-  block_to_points(&scr_full, block_point, block);
+  block_to_points(screen, block_point, block);
 
   for(int x = 0; x < BLOCK_POINTS; ++x) {
     point_t *tmp = &block_point[x];
 
-    putChar(tmp->x, tmp->y, '#', 0x07);
+    putChar(screen->first.x + tmp->x, screen->first.y + tmp->y, '#', 0x07);
   }
 }
 
