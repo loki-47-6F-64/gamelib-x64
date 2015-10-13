@@ -6,14 +6,14 @@
 
 #define BLOCK_POINTS 4
 
-#define FIELD_SIZE_X 20
+#define FIELD_SIZE_X 40
 #define FIELD_SIZE_Y 20
 
 #define BLOCK_QUEUE_SIZE 4
 
 typedef struct {
-  point_t bound_l;
-  point_t bound_r;
+  screen_t screen;
+
   int32_t field[FIELD_SIZE_Y][FIELD_SIZE_X];
 } field_t;
 
@@ -38,10 +38,11 @@ extern game_t game;
 /**
  * Convert points in block to real points
  * params:
+ *  screen -- the screen the block is in.
  *  in -- the points to put the result in
  *  out -- the block
  */
-void block_to_points(point_t *in, block_t *out);
+void block_to_points(screen_t *screen, point_t *in, block_t *out);
 
 /**
  * (logically) rotates the block.
@@ -87,10 +88,8 @@ void field_draw(field_t *field);
  *  field -- the field to init
  *  x -- x-origin
  *  y -- y-origin
- *  wdith
- *  height
  */
-void field_init(field_t *field, int32_t x, int32_t y, int32_t width, int32_t height);
+void field_init(field_t *field, int32_t x, int32_t y); 
 
 /**
  * Checks wether it is possible to place the block
@@ -117,11 +116,18 @@ void game_draw(game_t *game);
 void game_init(game_t *game);
 
 /**
+ * like block_draw, but with color background on special purposes
  * params:
  *  field -- to know where to put the red background
  *  block -- the block to draw
  */
 void field_block_draw(field_t *field, block_t *block);
+
+/**
+ * params:
+ *  block -- the block to draw
+ */
+void block_draw(block_t *block);
 
 /**
  * params:

@@ -97,10 +97,13 @@ void print_snapshot(snapshot_t *snapshot) {
 /**
  * Convert points in block to real points
  * params:
+ *  screen -- the screen the block is in
  *  in -- the points to put the result in
  *  out -- the block
  */
-void block_to_points(point_t *in, block_t *out) {
+void block_to_points(screen_t *screen, point_t *in, block_t *out) {
+  assert(screen && in && out);
+
   const int32_t max = BLOCK_POINTS -1;
   for(int x = 0; x < BLOCK_POINTS; ++x) {
     if(out->rotate) {
@@ -125,7 +128,7 @@ void block_to_points(point_t *in, block_t *out) {
     in[x].x += out->origin.x;
     in[x].y += out->origin.y;
     // Normalize result
-    normalize(&scr_full, &in[x]);
+    normalize(screen, &in[x]);
   }
 }
 
@@ -141,20 +144,12 @@ int field_empty(field_t *field, block_t *block) {
   assert(field && block);
 
   point_t block_point[BLOCK_POINTS];
-  block_to_points(block_point, block);
+  block_to_points(&scr_full, block_point, block);
 
   for(int x = 0; x < BLOCK_POINTS; ++x) {
     point_t *tmp = &block_point[x];
     // if field occupied
     if(field->field[tmp->y][tmp->x]) {
-      return 0;
-    }
-
-    // if point out of bounds
-    if(
-      tmp->x >= field->bound_r.x || tmp->y >= field->bound_r.y ||
-      tmp->x <= field->bound_l.x || tmp->y <= field->bound_l.y)
-    {
       return 0;
     }
   }
@@ -194,7 +189,7 @@ void game_init(game_t *game) {
   fill(game, 0, sizeof(game_t));
 
   game->player = game->queue;
-  field_init(&game->field, 20, 1, 20, 20);
+  field_init(&game->field, 10, 1);
 
   for(int x = 0; x < BLOCK_POINTS; ++x) {
     block_next(&game->queue[x]);
@@ -283,19 +278,17 @@ void c_loop() {
  *  wdith
  *  height
  */
-void field_init(field_t *field, int32_t x, int32_t y, int32_t width, int32_t height) {
+void field_init(field_t *field, int32_t x, int32_t y) {
   assert(field)
 
   assert(x >= 0 && y >= 0)
-  assert(width > 0 && height > 0)
-  assert((x + width <= SCREEN_SIZE_X) && (y + height <= SCREEN_SIZE_Y))
+  assert((x + FIELD_SIZE_X <= SCREEN_SIZE_X) && (y + FIELD_SIZE_Y <= SCREEN_SIZE_Y))
 
 
-  point_t l = { x, y };
-  point_t r = { x + width, y + height };
+  // point_t l = { x, y };
+  // point_t r = { x + FIELD_SIZE_X, y +  FIELD_SIZE_Y};
 
-  field->bound_l = l;
-  field->bound_r = r;
+  screen_init(&field->screen, x +1, y +1, FIELD_SIZE_X -1, FIELD_SIZE_Y -1);
   fill(field->field, 0, sizeof(field->field));
 }
 
@@ -339,15 +332,17 @@ void block_rotate(block_t *block) {
 void field_draw(field_t *field) {
   assert(field);
 
+  point_t bound_l = { field->screen.first.x -1, field->screen.first.y -1 };
+  point_t bound_r = { field->screen.last.x, field->screen.last.y };
 
-  for(int x = field->bound_l.x; x <= field->bound_r.x; ++x) {
-    putChar(x, field->bound_l.y, '+', 0x7F);
-    putChar(x, field->bound_r.y, '+', 0x7F);
+  for(int x = bound_l.x; x <= bound_r.x; ++x) {
+    putChar(x, bound_l.y, '+', 0x7F);
+    putChar(x, bound_r.y, '+', 0x7F);
   }
 
-  for(int y = field->bound_l.y; y <= field->bound_r.y; ++y) {
-    putChar(field->bound_l.x, y, '+', 0x7F);
-    putChar(field->bound_r.x, y, '+', 0x7F);
+  for(int y = bound_l.y; y <= bound_r.y; ++y) {
+    putChar(bound_l.x, y, '+', 0x7F);
+    putChar(bound_r.x, y, '+', 0x7F);
   }
 
   for(int y = 0; y < FIELD_SIZE_Y; ++y) {
@@ -366,7 +361,30 @@ void field_draw(field_t *field) {
  */
 void game_draw(game_t *game) {
   field_draw(&game->field);
+
+  for(int x = 0; x < BLOCK_QUEUE_SIZE; ++x) {
+    block_draw(&game->queue[x]);
+  }
+
   field_block_draw(&game->field, game->player);
+}
+
+/**
+ * params:
+ *  block -- the block to draw
+ */
+void block_draw(block_t *block) {
+  assert(block);
+
+  return;
+  point_t block_point[BLOCK_POINTS];
+  block_to_points(&scr_full, block_point, block);
+
+  for(int x = 0; x < BLOCK_POINTS; ++x) {
+    point_t *tmp = &block_point[x];
+
+    putChar(tmp->x, tmp->y, '#', 0x07);
+  }
 }
 
 /**
@@ -375,29 +393,23 @@ void game_draw(game_t *game) {
  *  block -- the block to draw
  */
 void field_block_draw(field_t *field, block_t *block) {
-  assert(block);
+  assert(field && block);
 
+  screen_t *screen = &field->screen;
   point_t block_point[BLOCK_POINTS];
-  block_to_points(block_point, block);
+  block_to_points(screen, block_point, block);
 
   for(int x = 0; x < BLOCK_POINTS; ++x) {
     int8_t color = 0x27;
 
     point_t *tmp = &block_point[x];
+
     // if field occupied
     if(field->field[tmp->y][tmp->x]) {
-      color = 0xB7; // red background
+      color = 0xC7; // red background
     }
 
-    // if point out of bounds
-    if(
-      tmp->x >= field->bound_r.x || tmp->y >= field->bound_r.y ||
-      tmp->x <= field->bound_l.x || tmp->y <= field->bound_l.y)
-    {
-      color = 0x67; // brown background
-    }
-
-    putChar(tmp->x, tmp->y, '#', color);
+    putChar(screen->first.x + tmp->x, screen->first.y + tmp->y, '#', color);
   }
 }
 
@@ -418,9 +430,38 @@ void block_square(block_t *block) {
 }
 
 void block_pole(block_t *block) {
+  point_t *p = block->point;
+
+  p[0].x = 1;
+  p[0].y = 0;
+
+  p[1].x = 1;
+  p[1].y = 1;
+
+  p[2].x = 1;
+  p[2].y = 2;
+
+  p[3].x = 1;
+  p[3].y = 3;
+
 }
+
 void block_hook(block_t *block) {
+  point_t *p = block->point;
+
+  p[0].x = 0;
+  p[0].y = 1;
+
+  p[1].x = 1;
+  p[1].y = 1;
+
+  p[2].x = 1;
+  p[2].y = 0;
+
+  p[3].x = 2;
+  p[3].y = 0;
 }
+
 void block_stage(block_t *block) {
   point_t *p = block->point;
 
@@ -446,7 +487,6 @@ void block_next(block_t *block) {
   assert(block);
 
   uint64_t type = rand_next() % 4;
-  type = 3;
   switch(type) {
     case 0:
       block_square(block);

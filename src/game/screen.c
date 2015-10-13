@@ -20,23 +20,23 @@ int32_t normalize(screen_t *screen, point_t *p) {
 
   uint32_t result = 1;
   // Make sure the screen remains inside the bounds of the screen
-  if(p->x >= bound_x) {
+  while(p->x >= bound_x) {
     p->x -= bound_x;
 
     result = 1;
   }
-  else if(p->x < 0) {
+  while(p->x < 0) {
     p->x += bound_x;
 
     result = 1;
   }
 
-  if(p->y >= bound_y) {
+  while(p->y >= bound_y) {
     p->y -= bound_y;
 
     result = 1;
   }
-  else if(p->y < 0) {
+  while(p->y < 0) {
     p->y += bound_y;
 
     result = 1;
