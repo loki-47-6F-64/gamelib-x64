@@ -263,7 +263,13 @@ void c_loop() {
       case KEY_CODE_S:
         block_rotate(game.player);
         break;
+      case KEY_CODE_ENT:
+        if(field_empty(&game.field, game.player)) {
+          field_block_merge(&game.field, game.player);
+        }
+        break;
     }
+
 
     game_draw(&game);
   }
@@ -349,7 +355,7 @@ void field_draw(field_t *field) {
     for(int x = 0; x < FIELD_SIZE_X; ++x) {
       // draw blocks
       if(field->field[y][x]) {
-        putChar(x, y, '#', 0x07);
+        putChar(field->screen.first.x + x, field->screen.first.y + y, '#', 0x07);
       }
     }
   }
@@ -501,5 +507,23 @@ void block_next(block_t *block) {
       block_stage(block);
       break;
   }
+}
+
+/**
+ * merge the block with field.
+ * params:
+ *  field -- the field for merging
+ *  block -- the block for merging
+ */
+void field_block_merge(field_t *field, block_t *block) {
+  assert(field && block);
+
+  point_t block_point[BLOCK_POINTS];
+  block_to_points(&field->screen, block_point, block);
+
+  for(int x = 0; x < BLOCK_POINTS; ++x) {
+    field->field[block_point[x].y][block_point[x].x] = 1;
+  }
+
 }
 

@@ -6,7 +6,7 @@
 
 #define BLOCK_POINTS 4
 
-#define FIELD_SIZE_X 40
+#define FIELD_SIZE_X 20
 #define FIELD_SIZE_Y 20
 
 #define BLOCK_QUEUE_SIZE 4
@@ -144,4 +144,11 @@ void block_mov(block_t *block, int32_t x, int32_t y);
  */
 void block_next(block_t *block);
 
+/**
+ * merge the block with field.
+ * params:
+ *  field -- the field for merging
+ *  block -- the block for merging
+ */
+void field_block_merge(field_t *field, block_t *block);
 #endif
