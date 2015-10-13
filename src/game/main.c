@@ -144,7 +144,7 @@ int field_empty(field_t *field, block_t *block) {
   assert(field && block);
 
   point_t block_point[BLOCK_POINTS];
-  block_to_points(&scr_full, block_point, block);
+  block_to_points(&field->screen, block_point, block);
 
   for(int x = 0; x < BLOCK_POINTS; ++x) {
     point_t *tmp = &block_point[x];
@@ -194,21 +194,17 @@ void game_init(game_t *game) {
   screen_init(&game->block_screen,
       FIELD_SIZE_X + game->field.screen.first.x  +2,
       4,
-      10,
+      5,
       BLOCK_POINTS *4 +1
   );
 
-  for(int x = 0; x < BLOCK_QUEUE_SIZE; ++x) {
-    point_t *tmp = &game->queue[x].origin;
-
-    tmp->x = 0;
-    tmp->y = (x << 2); // x *4
-  }
-
+  game_block_reset(game);
 
   for(int x = 0; x < BLOCK_POINTS; ++x) {
     block_next(&game->queue[x]);
   }
+
+  game->timer = 10 *TICKS_PER_SEC;
 }
 
 uint64_t init = 0;
@@ -233,7 +229,7 @@ uint64_t rand_next() {
 
   res = (res / div) % 1000;
 
-  seed = res;
+  seed = res + 1234;
   return res;
 }
 
@@ -257,8 +253,14 @@ void c_loop() {
 
   int64_t ascii = readKeyCode();
 
+  screen_t scr_timer;
+  screen_init(&scr_timer, 0, 0, SCREEN_SIZE_X, 1);
+
+  --game.timer;
   if(ascii) {
     screen_clear(NULL, 0x00);
+
+    cursor_mov(&scr_full, 25, 0);
     writef(NULL, "KeyCode of key presses: %h", ascii);
     switch(ascii) {
       case KEY_CODE_AU:
@@ -280,15 +282,43 @@ void c_loop() {
         if(field_empty(&game.field, game.player)) {
           field_block_merge(&game.field, game.player);
 
-          
+          game_next(&game); 
         }
         break;
     }
 
-
     game_draw(&game);
   }
+
+  if(game.timer == 0) {
+    screen_clear(NULL, 0x00);
+    writef(NULL, "The application crashed...%nWhy did you abandon it? You monster!");
+    while(1);
+  }
+
+  writef(&scr_timer, "Time left: %c%u%c seconds!", 0xC7, game.timer / TICKS_PER_SEC +1, 0x07);
 }
+
+/**
+ * A block has been placed, it is time for a new block.
+ * Oh... and the timer needs to be reset, I guess..
+ */
+void game_next(game_t *game) {
+  assert(game);
+
+  block_next(game->player);
+
+  // next block in queue
+  ++game->player;
+  if(game->player >= (game->queue + BLOCK_QUEUE_SIZE)) {
+    game->player = game->queue;
+  }
+  
+  game_block_reset(game);
+
+  game->timer = 10 * TICKS_PER_SEC;
+}
+
 
 /**
  * initializes a field.
@@ -383,6 +413,7 @@ void field_draw(field_t *field) {
 void game_draw(game_t *game) {
   field_draw(&game->field);
 
+  screen_clear(&game->block_screen, 0x30);
   for(int x = 0; x < BLOCK_QUEUE_SIZE; ++x) {
     if(game->player != (game->queue + x)) {
       block_draw(&game->block_screen, &game->queue[x]);
@@ -509,7 +540,13 @@ void block_stage(block_t *block) {
 void block_next(block_t *block) {
   assert(block);
 
-  uint64_t type = rand_next() % 4;
+  uint64_t type = rand_next() % 8;
+  if(type == 7) {
+    // Deallocation block
+    return;
+  }
+
+  type %= 4;
   switch(type) {
     case 0:
       block_square(block);
@@ -544,3 +581,21 @@ void field_block_merge(field_t *field, block_t *block) {
 
 }
 
+/**
+ * reset the origin of all blocks in the queue
+ * params:
+ *  game -- the game
+ */
+void game_block_reset(game_t *game) {
+  for(int x = 0; x < BLOCK_QUEUE_SIZE; ++x) {
+    block_t *tmp_block = &game->queue[x];
+
+    tmp_block->mirror = 0;
+    tmp_block->rotate = 0;
+
+    point_t *tmp_p = &tmp_block->origin;
+
+    tmp_p->x = 0;
+    tmp_p->y = (x << 2); // x *4
+  }
+}

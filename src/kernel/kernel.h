@@ -34,6 +34,7 @@
 #define KEY_CODE_AL 75
 #define KEY_CODE_AR 77
 
+#define TICKS_PER_SEC 60 // Hz
 
 #include "src/kernel/stdint.h"
 int64_t readKeyCode();

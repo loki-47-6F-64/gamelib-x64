@@ -33,6 +33,7 @@ typedef struct {
 
   field_t field;
   screen_t block_screen;
+  uint64_t timer;
 } game_t;
 
 extern game_t game;
@@ -153,4 +154,18 @@ void block_next(block_t *block);
  *  block -- the block for merging
  */
 void field_block_merge(field_t *field, block_t *block);
+
+/**
+ * A block has been placed, it is time for a new block.
+ * Oh... and the timer needs to be reset, I guess..
+ */
+void game_next(game_t *game);
+
+/**
+ * reset the origin of all blocks in the queue
+ * params:
+ *  game -- the game
+ */
+void game_block_reset(game_t *game);
+
 #endif
