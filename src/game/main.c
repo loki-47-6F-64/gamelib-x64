@@ -10,89 +10,8 @@
 
 game_t game;
 
-typedef struct {
-  uint64_t rax;
-  uint64_t rbx;
-  uint64_t rcx;
-  uint64_t rdx;
-  uint64_t rsi;
-  uint64_t rdi;
-  uint64_t rbp;
-  uint64_t rsp;
-  uint64_t r8;
-  uint64_t r9;
-  uint64_t r10;
-  uint64_t r11;
-  uint64_t r12;
-  uint64_t r13;
-  uint64_t r14;
-  uint64_t r15;
-  const char *message;
-  const uint64_t stack[0];
-} __attribute__((packed)) snapshot_t;
+uint64_t game_state;
 
-void print_snapshot(snapshot_t *snapshot) {
-  screen_clear(NULL, 0x90);
-
-  writef(NULL, "%c"
-      "This is a snapshot of the state of the game.%n"
-      "The game send the following message:%n"
-      "%s", 0x9F, snapshot->message);
-
-  char *regs[] = {
-    "rax",
-    "rbx",
-    "rcx",
-    "rdx",
-    "rsi",
-    "rdi",
-    "rbp",
-    "rsp",
-    "r8 ",
-    "r9 ",
-    "r10",
-    "r11",
-    "r12",
-    "r13",
-    "r14",
-    "r15"
-  };
-
-  screen_t scr_regs;
-  screen_init(&scr_regs, 2, 8, 24, 17);
-
-  uint64_t *vals = (uint64_t*)snapshot;
-  const uint64_t size = sizeof(regs) / 8;
-
-  screen_clear(&scr_regs, 0x10);
-  writef(&scr_regs, "%cThe registers:%n", 0x1F);
-  for(uint64_t x = 0; x < size; ++x) {
-    writef(&scr_regs, "%c%s | 0x%h", 0x1F, regs[x], vals[x]);
-  }
-
-  screen_t scr_msg;
-  screen_t scr_addr;
-  screen_t scr_stack;
-
-  screen_init(&scr_msg, 29, 8, 50, 1);
-  screen_init(&scr_addr, 29, 9, 4, 16);
-  screen_init(&scr_stack, 33, 9, 46, 16);
-
-  screen_clear(&scr_msg, 0x10); 
-  screen_clear(&scr_addr, 0x10); 
-  screen_clear(&scr_stack, 0x10); 
-  writef(&scr_msg, "%cThe stack | (Hex and Integer)", 0x1F);
-  for(int32_t y = 0; y < (scr_addr.last.y - scr_addr.first.y); ++y) {
-    writef(&scr_addr, "%c%u", 0x1F, y << 3);
-
-    uint64_t stack_val = snapshot->stack[y];
-    writef(&scr_stack, "%c | 0x%h | %u%n", 0x1F, stack_val, stack_val);
-
-    // new line
-    cursor_mov(&scr_addr, 0, 1);
-    scr_addr.cursor.x = 0;
-  }
-}
 
 /**
  * Convert points in block to real points
@@ -190,7 +109,7 @@ void game_init(game_t *game) {
 
   game->player = game->queue;
 
-  field_init(&game->field, 10, 1);
+  field_init(&game->field, 10, 6);
   screen_init(&game->block_screen,
       FIELD_SIZE_X + game->field.screen.first.x  +2,
       4,
@@ -204,53 +123,27 @@ void game_init(game_t *game) {
     block_next(&game->queue[x]);
   }
 
-  game->timer = 10 *TICKS_PER_SEC;
+  game->timer = 6 *TICKS_PER_SEC;
 }
 
-uint64_t init = 0;
-
-uint64_t seed = 1234;
+uint64_t seed = 973;
 uint64_t rand_next() {
-  uint64_t res = seed * seed;
+  // wiki https://en.wikipedia.org/wiki/Linear_congruential_generator
+  // X<n+1> = (aX<n> + c) mod m
+  // 0 <= X<0> < m
+  // m and c are relatively prime
+  // a - 1 is divisible by all primefactors of m
+  // a - 1 is divisible by 4 if m is divisible by 4
+  const uint64_t a = 1103515245;
+  const uint64_t c = 12345;
+  const uint64_t m = 1 << 31;
 
-  // shave of the first two and last two digits
-  uint64_t div = 100;
+  seed = (a*seed + c) % m;
 
-  // less than 8 digits
-  if(res < 10000000) {
-    div = 10;
-  }
-
-  // less than 7 digits
-  if(res < 1000000) {
-    div = 1;
-  }
-
-
-  res = (res / div) % 1000;
-
-  seed = res + 1234;
-  return res;
+  return seed;
 }
 
-/**
- * initializes any global vars
- */
-void c_init() {
-  // 60HZ
-  setTimer(19886);
-
-  screen_init(&scr_full, 0, 0, SCREEN_SIZE_X, SCREEN_SIZE_Y);
-  screen_clear(NULL, 0x00);
-
-  game_init(&game);
-
-  init = 1;
-}
-
-void c_loop() {
-  if(!init) return;
-
+void c_game_loop() {
   int64_t ascii = readKeyCode();
 
   screen_t scr_timer;
@@ -279,7 +172,9 @@ void c_loop() {
         block_rotate(game.player);
         break;
       case KEY_CODE_ENT:
-        if(field_empty(&game.field, game.player)) {
+        if( game.player->dealloc ||
+            field_empty(&game.field, game.player)
+        ) {
           field_block_merge(&game.field, game.player);
 
           game_next(&game); 
@@ -299,6 +194,62 @@ void c_loop() {
   writef(&scr_timer, "Time left: %c%u%c seconds!", 0xC7, game.timer / TICKS_PER_SEC +1, 0x07);
 }
 
+void c_menu_init() {
+  screen_t middle;
+  screen_init(&middle, 20, 5, 40, 15);
+
+  screen_clear(NULL, 0x00);
+
+  writef(&middle,
+      "Please select the %capplication%c to run.%n%n%n"
+      "[1] :: %cGame%c%n%n"
+      "[2] :: %cHighscore",
+      0xCF, 0x07, 0x4F, 0x07, 0x4F
+  );
+
+}
+
+void c_menu_loop() {
+  uint64_t ascii = readKeyCode();
+
+  seed = (seed +1) % (1 << 31);
+  screen_t middle;
+  screen_init(&middle, 25, 5, 25, 15);
+
+  if(ascii) {
+    switch(ascii) {
+      case KEY_CODE_1:
+        game_init(&game);
+        game_state = STATE_GAME;
+        break;
+    };
+  }
+}
+
+void c_loop() {
+  if(game_state == STATE_GAME) {
+    c_game_loop();
+  }
+  else if(game_state == STATE_MENU) {
+    c_menu_loop();
+  }
+
+}
+
+/**
+ * initializes any global vars
+ */
+void c_init() {
+  // 60HZ
+  setTimer(19886);
+
+  screen_init(&scr_full, 0, 0, SCREEN_SIZE_X, SCREEN_SIZE_Y);
+  screen_clear(NULL, 0x00);
+
+  c_menu_init();
+}
+
+
 /**
  * A block has been placed, it is time for a new block.
  * Oh... and the timer needs to be reset, I guess..
@@ -306,6 +257,7 @@ void c_loop() {
 void game_next(game_t *game) {
   assert(game);
 
+  game_block_reset(game);
   block_next(game->player);
 
   // next block in queue
@@ -313,10 +265,8 @@ void game_next(game_t *game) {
   if(game->player >= (game->queue + BLOCK_QUEUE_SIZE)) {
     game->player = game->queue;
   }
-  
-  game_block_reset(game);
 
-  game->timer = 10 * TICKS_PER_SEC;
+  game->timer = 6 * TICKS_PER_SEC;
 }
 
 
@@ -335,9 +285,6 @@ void field_init(field_t *field, int32_t x, int32_t y) {
   assert(x >= 0 && y >= 0)
   assert((x + FIELD_SIZE_X <= SCREEN_SIZE_X) && (y + FIELD_SIZE_Y <= SCREEN_SIZE_Y))
 
-
-  // point_t l = { x, y };
-  // point_t r = { x + FIELD_SIZE_X, y +  FIELD_SIZE_Y};
 
   screen_init(&field->screen, x +1, y +1, FIELD_SIZE_X -1, FIELD_SIZE_Y -1);
   fill(field->field, 0, sizeof(field->field));
@@ -437,7 +384,12 @@ void block_draw(screen_t *screen, block_t *block) {
   for(int x = 0; x < BLOCK_POINTS; ++x) {
     point_t *tmp = &block_point[x];
 
-    putChar(screen->first.x + tmp->x, screen->first.y + tmp->y, '#', 0x07);
+    char b = '#';
+    if(block->dealloc) {
+      b = '-';
+    }
+
+    putChar(screen->first.x + tmp->x, screen->first.y + tmp->y, b, 0x07);
   }
 }
 
@@ -463,7 +415,12 @@ void field_block_draw(field_t *field, block_t *block) {
       color = 0xC7; // red background
     }
 
-    putChar(screen->first.x + tmp->x, screen->first.y + tmp->y, '#', color);
+    char b = '#';
+    if(block->dealloc) {
+      b = '-';
+    }
+
+    putChar(screen->first.x + tmp->x, screen->first.y + tmp->y, b, color);
   }
 }
 
@@ -540,13 +497,14 @@ void block_stage(block_t *block) {
 void block_next(block_t *block) {
   assert(block);
 
-  uint64_t type = rand_next() % 8;
-  if(type == 7) {
+  block->dealloc = 0;
+  uint64_t type = rand_next() % 20;
+  if(type > 16) {
     // Deallocation block
-    return;
+    block->dealloc = 1;
   }
 
-  type %= 4;
+  type = (type +1) % 4;
   switch(type) {
     case 0:
       block_square(block);
@@ -576,7 +534,7 @@ void field_block_merge(field_t *field, block_t *block) {
   block_to_points(&field->screen, block_point, block);
 
   for(int x = 0; x < BLOCK_POINTS; ++x) {
-    field->field[block_point[x].y][block_point[x].x] = 1;
+    field->field[block_point[x].y][block_point[x].x] = 1 - block->dealloc;
   }
 
 }

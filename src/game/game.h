@@ -6,10 +6,14 @@
 
 #define BLOCK_POINTS 4
 
-#define FIELD_SIZE_X 20
-#define FIELD_SIZE_Y 20
+#define FIELD_SIZE_X 12
+#define FIELD_SIZE_Y 12
 
 #define BLOCK_QUEUE_SIZE 4
+
+#define STATE_MENU      0
+#define STATE_GAME      1
+#define STATE_HIGHSCORE 2
 
 typedef struct {
   screen_t screen;
@@ -25,6 +29,7 @@ typedef struct {
   // either 1 or 0
   int32_t mirror;
   int32_t rotate;
+  int32_t dealloc;
 } block_t;
 
 typedef struct {
@@ -37,6 +42,7 @@ typedef struct {
 } game_t;
 
 extern game_t game;
+extern uint64_t game_state;
 /**
  * Convert points in block to real points
  * params:

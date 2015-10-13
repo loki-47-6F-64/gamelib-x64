@@ -27,6 +27,10 @@
 #define KEY_CODE_A 0x1E
 #define KEY_CODE_D 0x20
 
+#define KEY_CODE_1 2
+#define KEY_CODE_2 3
+#define KEY_CODE_3 4
+
 #define KEY_CODE_ENT 0x1C
 
 #define KEY_CODE_AU 72

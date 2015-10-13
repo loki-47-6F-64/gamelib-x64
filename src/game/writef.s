@@ -57,7 +57,7 @@ writef_next_arg:
 writef_next_arg_if:
   inc %r13 # skip the 4th 'parameter'
 
-  jmp *%r8
+  ret
 # This MUST only be called from writef
 # params:
 #   0. (char) arg
