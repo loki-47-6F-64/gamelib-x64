@@ -1,70 +1,70 @@
 #include "src/game/screen.h"
 #include "src/kernel/kernel.h"
 
-/*
- * Makes sure the point is within boundaries of the screen
- * params:
- *  screen -- the screen to use for normalization
- *  p -- the point to normalize
- *
- * return:
- *  non-zero on overflow of boundaries of (x or y)
- */
-int32_t _normalize(screen_t *screen, point_t *p) {
-  assert(screen && p)
-
-  const int32_t bound_x = screen->last.x - screen->first.x;
-  const int32_t bound_y = screen->last.y - screen->first.y;
-
-  assert(bound_x <= SCREEN_SIZE_X && bound_y <= SCREEN_SIZE_Y);
-
-  uint32_t result = 1;
-  // Make sure the screen remains inside the bounds of the screen
-  while(p->x >= bound_x) {
-    p->x -= bound_x;
-
-    result = 1;
-  }
-  while(p->x < 0) {
-    p->x += bound_x;
-
-    result = 1;
-  }
-
-  while(p->y >= bound_y) {
-    p->y -= bound_y;
-
-    result = 1;
-  }
-  while(p->y < 0) {
-    p->y += bound_y;
-
-    result = 1;
-  }
-
-  return result;
-}
-
-/**
- * move screen position to (x,y) relative to it's current position.
- * If the screen goes out of bounds, it will emerge from the other side.
- * params:
- *  screen
- *  x
- *  y
- * return:
- *  non-zero on overflow of x or y
- */
-int64_t cursor_mov(screen_t *screen, int32_t x, int32_t y) {
-  assert(screen);
-
-  point_t *cursor = &screen->cursor;
-
-  cursor->x += x;
-  cursor->y += y;
-
-  return normalize(screen, cursor);
-}
+// /*
+//  * Makes sure the point is within boundaries of the screen
+//  * params:
+//  *  screen -- the screen to use for normalization
+//  *  p -- the point to normalize
+//  *
+//  * return:
+//  *  non-zero on overflow of boundaries of (x or y)
+//  */
+// int32_t normalize(screen_t *screen, point_t *p) {
+//   assert(screen && p)
+// 
+//   const int32_t bound_x = screen->last.x - screen->first.x;
+//   const int32_t bound_y = screen->last.y - screen->first.y;
+// 
+//   assert(bound_x <= SCREEN_SIZE_X && bound_y <= SCREEN_SIZE_Y);
+// 
+//   uint32_t result = 1;
+//   // Make sure the screen remains inside the bounds of the screen
+//   while(p->x >= bound_x) {
+//     p->x -= bound_x;
+// 
+//     result = 1;
+//   }
+//   while(p->x < 0) {
+//     p->x += bound_x;
+// 
+//     result = 1;
+//   }
+// 
+//   while(p->y >= bound_y) {
+//     p->y -= bound_y;
+// 
+//     result = 1;
+//   }
+//   while(p->y < 0) {
+//     p->y += bound_y;
+// 
+//     result = 1;
+//   }
+// 
+//   return result;
+// }
+// 
+// /**
+//  * move screen position to (x,y) relative to it's current position.
+//  * If the screen goes out of bounds, it will emerge from the other side.
+//  * params:
+//  *  screen
+//  *  x
+//  *  y
+//  * return:
+//  *  non-zero on overflow of x or y
+//  */
+// int64_t cursor_mov(screen_t *screen, int32_t x, int32_t y) {
+//   assert(screen);
+// 
+//   point_t *cursor = &screen->cursor;
+// 
+//   cursor->x += x;
+//   cursor->y += y;
+// 
+//   return normalize(screen, cursor);
+// }
 
 /**
  * increment screen position

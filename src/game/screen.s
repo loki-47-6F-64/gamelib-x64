@@ -20,7 +20,37 @@
 .text
 
 .global normalize
+.global cursor_mov
 
+/**
+ * move screen position to (x,y) relative to it's current position.
+ * If the screen goes out of bounds, it will emerge from the other side.
+ * params:
+ *  (screen_t*) screen
+ *  (int32_t) x
+ *  (int32_t) y
+ * return:
+ *  non-zero on overflow of x or y
+ */
+cursor_mov:
+  pushq %rbp
+  movq %rsp, %rbp
+
+  assert $0, %rdi, cursor_mov_1, jne
+
+  lea 16(%rdi), %r11 # &screen->cursor
+
+  # Add x and y to the cursor
+  addl %esi, (%r11)  # x
+  addl %edx, 4(%r11) # y
+
+  movq %r11, %rsi
+  call normalize # normalize(screen, cursor)
+  
+  movq %rbp, %rsp
+  popq %rbp
+
+  ret
 /*
  * Makes sure the point is within boundaries of the screen
  * params:
