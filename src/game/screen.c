@@ -65,46 +65,46 @@
 // 
 //   return normalize(screen, cursor);
 // }
-
-/**
- * increment screen position
- * params:
- *  screen
- *
- * return:
- *  1  on overflow of x
- *  -1 on overflow of y
- *  0 otherwise
- */
-int cursor_inc(screen_t *screen) {
-  assert(screen)
-
-  const int32_t bound_x = screen->last.x - screen->first.x;
-  const int32_t bound_y = screen->last.y - screen->first.y;
-
-  assert(bound_x <= SCREEN_SIZE_X && bound_y <= SCREEN_SIZE_Y);
-
-  point_t *cursor = &screen->cursor;
-
-  ++cursor->x;
-
-  if(cursor->x >= bound_x) {
-    cursor->x = 0;
-
-    ++cursor->y;
-
-    if(cursor->y >= bound_y) {
-      cursor->y = 0;
-
-      return -1;
-    }
-
-    return 1;
-  }
-
-
-  return 0;
-}
+//
+// /**
+//  * increment screen position
+//  * params:
+//  *  screen
+//  *
+//  * return:
+//  *  1  on overflow of x
+//  *  -1 on overflow of y
+//  *  0 otherwise
+//  */
+// int cursor_inc(screen_t *screen) {
+//   assert(screen)
+// 
+//   const int32_t bound_x = screen->last.x - screen->first.x;
+//   const int32_t bound_y = screen->last.y - screen->first.y;
+// 
+//   assert(bound_x <= SCREEN_SIZE_X && bound_y <= SCREEN_SIZE_Y);
+// 
+//   point_t *cursor = &screen->cursor;
+// 
+//   ++cursor->x;
+// 
+//   if(cursor->x >= bound_x) {
+//     cursor->x = 0;
+// 
+//     ++cursor->y;
+// 
+//     if(cursor->y >= bound_y) {
+//       cursor->y = 0;
+// 
+//       return -1;
+//     }
+// 
+//     return 1;
+//   }
+// 
+// 
+//   return 0;
+// }
 
 /**
  * Makes the entire screen black

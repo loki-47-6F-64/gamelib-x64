@@ -21,6 +21,57 @@
 
 .global normalize
 .global cursor_mov
+.global cursor_inc
+
+/**
+ * increment screen position
+ * params:
+ *  (screen_t*) screen
+ *
+ * return:
+ *  1  on overflow of x
+ *  -1 on overflow of y
+ *  0 otherwise
+ */
+cursor_inc:
+  pushq %rbp
+  movq %rsp, %rbp
+
+  assert $0, %rdi, cursor_mov_1, jne
+
+  movl (%rdi), %r11d  # screen->first.x
+  movl 8(%rdi), %r10d # screen->last.x
+  movl 4(%rdi), %r9d  # screen->first.y
+  movl 12(%rdi), %r8d # screen->last.y
+
+  subl %r11d, %r10d # bound_x
+  subl %r9d, %r8d   # bound_y
+
+  assert $SCREEN_SIZE_X, %r10d, cursor_mov_bound_1, jle
+  assert $SCREEN_SIZE_Y, %r8d, cursor_mov_bound_1, jle
+
+  movq $0, %rax # result = 0
+
+  incl 16(%rdi)
+  cmpl 16(%rdi), %r10d
+  jg 1f
+
+# if cursor->x >= bound_x
+  movq $1, %rax # result = 1
+  movl $0, 16(%rdi) # reset x-coordinate
+  
+  incl 20(%rdi)
+  cmpl 20(%rdi), %r8d
+  jg 1f
+# if cursor->y >= bound_y
+  movq $-1, %rax # result = -1
+  movl $0, 20(%rdi) # reset y-coordinate
+1: # endif
+  
+  movq %rbp, %rsp
+  popq %rbp
+
+  ret
 
 /**
  * move screen position to (x,y) relative to it's current position.
