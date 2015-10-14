@@ -105,25 +105,25 @@
 // 
 //   return 0;
 // }
-
-/**
- * Makes the entire screen black
- * params:
- *  -- screen on NULL it is the entire screen
- *  -- color the background color
- */
-void screen_clear(screen_t *screen, int8_t color) {
-  if(!screen) {
-    screen = &scr_full;
-  }
-
-  screen->cursor.x = 0;
-  screen->cursor.y = 0;
-
-  do {
-    putChar(screen_x(screen), screen_y(screen), ' ', color);
-  } while(cursor_inc(screen) >= 0);
-}
+//
+// /**
+//  * Makes the entire screen black
+//  * params:
+//  *  -- screen on NULL it is the entire screen
+//  *  -- color the background color
+//  */
+// void screen_clear(screen_t *screen, int8_t color) {
+//   if(!screen) {
+//     screen = &scr_full;
+//   }
+// 
+//   screen->cursor.x = 0;
+//   screen->cursor.y = 0;
+// 
+//   do {
+//     putChar(screen_x(screen), screen_y(screen), ' ', color);
+//   } while(cursor_inc(screen) >= 0);
+// }
 
 /*
  * params:

@@ -22,7 +22,62 @@
 .global normalize
 .global cursor_mov
 .global cursor_inc
+.global screen_clear
 
+/**
+ * Makes the entire screen black
+ * params:
+ *  (screen_t*) screen -- on NULL it is the entire screen
+ *  (int8_t) color -- the background color
+ */
+screen_clear:
+  pushq %rbp
+  movq %rsp, %rbp
+
+  pushq %r15
+  pushq %r14
+  pushq %r13
+
+  movq %rdi, %r15 # screen
+  movq %rsi, %r14 # color
+
+  cmpq $0, %rdi # if screen == NULL, then use default screen
+  jne 1f
+
+  # use default screen instead
+  movq $scr_full, %r15
+1:
+  # reset cursor for the screen
+  movq $0, 16(%r15)
+
+2: # do
+  movq %r15, %rdi
+  call screen_x # get screen x-coordinate
+  movq %rax, %r13 # store x-coordinate
+
+  movq %r15, %rdi
+  call screen_y # get y-coordinate
+
+  movq %rax, %rsi # y
+  movq %r13, %rdi # x
+  movq $' ', %rdx
+  movq %r14, %rcx # color
+  call putChar
+
+  movq %r15, %rdi
+  call cursor_inc
+
+  cmp $0, %rax
+  jge 2b # while(cursor_inc(screen) >= 0)
+
+  popq %r13
+  popq %r14
+  popq %r15
+
+  movq %rbp, %rsp
+  popq %rbp
+
+  ret
 /**
  * increment screen position
  * params:
