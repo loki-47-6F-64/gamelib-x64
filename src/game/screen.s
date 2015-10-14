@@ -23,12 +23,61 @@
 .global cursor_mov
 .global cursor_inc
 .global screen_clear
+.global screen_x
+.global screen_y
+
+/*
+ * params:
+ *  (screen_t*) scr -- the screen
+ * returns:
+ *  absolute x coordinate
+ */
+screen_x:
+  pushq %rbp
+  movq %rsp, %rbp
+
+  assert $0, %rdi, screen_x_1, jne
+  
+  movq $0, %rax
+  movl 16(%rdi), %eax
+  addl (%rdi), %eax # scr->cursor.x + scr->first.x
+
+  assert $SCREEN_SIZE_X, %rax, screen_x_2, jl
+
+  movq %rbp, %rsp
+  popq %rbp
+
+  ret
+
+/*
+ * params:
+ *  (screen_t*) scr -- the screen
+ * returns:
+ *  absolute x coordinate
+ */
+screen_y:
+  pushq %rbp
+  movq %rsp, %rbp
+
+  assert $0, %rdi, screen_y_1, jne
+  
+  movq $0, %rax
+  movl 20(%rdi), %eax
+  addl 4(%rdi), %eax # scr->cursor.y + scr->first.y
+
+  assert $SCREEN_SIZE_Y, %rax, screen_y_2, jl
+
+  movq %rbp, %rsp
+  popq %rbp
+
+  ret
 
 /**
  * Makes the entire screen black
  * params:
  *  (screen_t*) screen -- on NULL it is the entire screen
- *  (int8_t) color -- the background color
+ *  (int8_t) color -- the background co:w
+lor
  */
 screen_clear:
   pushq %rbp

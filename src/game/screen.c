@@ -124,32 +124,32 @@
 //     putChar(screen_x(screen), screen_y(screen), ' ', color);
 //   } while(cursor_inc(screen) >= 0);
 // }
-
-/*
- * params:
- *  scr -- the screen
- * returns:
- *  absolute x coordinate
- */
-int32_t screen_x(screen_t *scr) {
-  assert(scr)
-  assert(scr->cursor.x + scr->first.x <= SCREEN_SIZE_X);
-
-  return scr->cursor.x + scr->first.x;
-}
-
-/*
- * params:
- *  scr -- the screen
- * returns:
- *  absolute y coordinate
- */
-int32_t screen_y(screen_t *scr) {
-  assert(scr)
-  assert(scr->cursor.y + scr->first.y <= SCREEN_SIZE_Y);
-  return scr->cursor.y + scr->first.y;
-}
-
+// 
+// /*
+//  * params:
+//  *  scr -- the screen
+//  * returns:
+//  *  absolute x coordinate
+//  */
+// int32_t screen_x(screen_t *scr) {
+//   assert(scr)
+//   assert(scr->cursor.x + scr->first.x < SCREEN_SIZE_X);
+// 
+//   return scr->cursor.x + scr->first.x;
+// }
+// 
+// /*
+//  * params:
+//  *  scr -- the screen
+//  * returns:
+//  *  absolute y coordinate
+//  */
+// int32_t screen_y(screen_t *scr) {
+//   assert(scr)
+//   assert(scr->cursor.y + scr->first.y < SCREEN_SIZE_Y);
+//   return scr->cursor.y + scr->first.y;
+// }
+// 
 /**
  * initializes a screen
  * params:
