@@ -25,6 +25,44 @@
 .global screen_clear
 .global screen_x
 .global screen_y
+.global screen_init
+
+/**
+ * initializes a screen
+ * params:
+ *  (screen_t*) scr -- the screen to initialize
+ *  (int32_t) x -- the x-origin
+ *  (int32_t) y -- the y-origin
+ *  (int32_t) width -- width of the screen
+ *  (int32_t) height -- height of the screen
+ */
+screen_init:
+  pushq %rbp
+  movq %rsp, %rbp
+
+  assert $0, %rdi, screen_init_1, jne
+  assert $0, %rsi, screen_init_2, jge
+  assert $0, %rdx, screen_init_3, jge
+  assert $0, %rcx, screen_init_4, jg
+  assert $0, %r8 , screen_init_5, jg
+
+  addq %rsi, %rcx # convert width into a x-coordinate
+  addq %rdx, %r8  # convert height into a y-coordinate
+
+  assert $SCREEN_SIZE_X, %rcx, screen_init_6, jle
+  assert $SCREEN_SIZE_Y, %r8, screen_init_7, jle
+
+  # After asserting so much, let's do some actual work...
+  movl %esi, (%rdi)   # first.x
+  movl %edx, 4(%rdi)  # first.y
+  movl %ecx, 8(%rdi)  # last.x
+  movl %r8d, 12(%rdi) # last.y
+  movq $0, 16(%rdi)   # init cursor to zero
+
+  movq %rbp, %rsp
+  popq %rbp
+
+  ret
 
 /*
  * params:
@@ -53,7 +91,7 @@ screen_x:
  * params:
  *  (screen_t*) scr -- the screen
  * returns:
- *  absolute x coordinate
+ *  absolute y coordinate
  */
 screen_y:
   pushq %rbp

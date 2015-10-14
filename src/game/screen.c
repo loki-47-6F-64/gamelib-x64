@@ -150,26 +150,26 @@
 //   return scr->cursor.y + scr->first.y;
 // }
 // 
-/**
- * initializes a screen
- * params:
- *  scr -- the screen to initialize
- *  x -- the x-origin
- *  y -- the y-origin
- *  width -- width of the screen
- *  height -- height of the screen
- */
-void screen_init(screen_t *scr, int32_t x, int32_t y, int32_t width, int32_t height) {
-  assert(scr)
-  assert(x >= 0 && y >= 0)
-  assert(width > 0 && height > 0)
-  assert((x + width <= SCREEN_SIZE_X) && (y + height <= SCREEN_SIZE_Y))
-
-  point_t c = {0};
-  point_t f = {x, y};
-  point_t l = {x + width, y + height};
-
-  scr->first  = f;
-  scr->last   = l;
-  scr->cursor = c;
-}
+// /**
+//  * initializes a screen
+//  * params:
+//  *  scr -- the screen to initialize
+//  *  x -- the x-origin
+//  *  y -- the y-origin
+//  *  width -- width of the screen
+//  *  height -- height of the screen
+//  */
+// void screen_init(screen_t *scr, int32_t x, int32_t y, int32_t width, int32_t height) {
+//   assert(scr)
+//   assert(x >= 0 && y >= 0)
+//   assert(width > 0 && height > 0)
+//   assert((x + width <= SCREEN_SIZE_X) && (y + height <= SCREEN_SIZE_Y))
+// 
+//   point_t c = {0};
+//   point_t f = {x, y};
+//   point_t l = {x + width, y + height};
+// 
+//   scr->first  = f;
+//   scr->last   = l;
+//   scr->cursor = c;
+// }
