@@ -1,11 +1,15 @@
 .att_syntax
 
 .ifndef GAME_DEBUG_H
+
+.set SCREEN_SIZE_X, 80
+.set SCREEN_SIZE_Y, 25
+
 .set GAME_DEBUG_H, $1
 
   .if NDEBUG == 1
     .macro assert op1, op2, assert_message, jmp_on=je
-      cmpq \op1, \op2
+      cmp \op1, \op2
       \jmp_on 2f
       pushq $1f
       jmp panic

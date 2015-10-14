@@ -10,7 +10,7 @@
  * return:
  *  non-zero on overflow of boundaries of (x or y)
  */
-int32_t normalize(screen_t *screen, point_t *p) {
+int32_t _normalize(screen_t *screen, point_t *p) {
   assert(screen && p)
 
   const int32_t bound_x = screen->last.x - screen->first.x;
