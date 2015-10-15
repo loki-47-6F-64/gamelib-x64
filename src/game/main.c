@@ -183,6 +183,8 @@ void c_menu_init() {
 
   screen_clear(NULL, 0x00);
 
+  writef(NULL, "sizeof(block_t) == %d", sizeof(game.queue));
+
   writef(&middle,
       "Please select the %capplication%c to run.%n%n%n"
       "[1] :: %cGame%c%n%n"
@@ -339,22 +341,22 @@ void game_draw(game_t *game) {
 
   field_block_draw(&game->field, game->player);
 }
-
-/**
- * reset the origin of all blocks in the queue
- * params:
- *  game -- the game
- */
-void game_block_reset(game_t *game) {
-  for(int x = 0; x < BLOCK_QUEUE_SIZE; ++x) {
-    block_t *tmp_block = &game->queue[x];
-
-    tmp_block->mirror = 0;
-    tmp_block->rotate = 0;
-
-    point_t *tmp_p = &tmp_block->origin;
-
-    tmp_p->x = 0;
-    tmp_p->y = (x << 2); // x *4
-  }
-}
+// 
+// /**
+//  * reset the origin of all blocks in the queue
+//  * params:
+//  *  game -- the game
+//  */
+// void _game_block_reset(game_t *game) {
+//   for(int x = 0; x < BLOCK_QUEUE_SIZE; ++x) {
+//     block_t *tmp_block = &game->queue[x];
+// 
+//     tmp_block->mirror = 0;
+//     tmp_block->rotate = 0;
+// 
+//     point_t *tmp_p = &tmp_block->origin;
+// 
+//     tmp_p->x = 0;
+//     tmp_p->y = (x << 2); // x *4
+//   }
+// }

@@ -22,7 +22,7 @@ typedef struct {
   screen_t screen;
 
   int32_t field[FIELD_SIZE_Y][FIELD_SIZE_X];
-} field_t;
+} __attribute__((packed)) field_t;
 
 typedef struct {
   point_t origin;
@@ -33,7 +33,7 @@ typedef struct {
   int32_t mirror;
   int32_t rotate;
   int32_t dealloc;
-} block_t;
+} __attribute__((packed)) block_t;
 
 typedef struct {
   block_t *player;
@@ -43,17 +43,17 @@ typedef struct {
   screen_t block_screen;
   uint64_t timer;
   uint64_t score;
-} game_t;
+} __attribute__((packed)) game_t;
 
 typedef struct {
   char name[4]; // three chars and a null-byte
   uint64_t score;
-} score_t;
+} __attribute__((packed)) score_t;
 
 typedef struct {
   char *name_p;
   score_t *score;
-} new_highscore_t;
+} __attribute__((packed)) new_highscore_t;
 
 extern score_t score[SCORE_SIZE];
 extern new_highscore_t new_highscore;

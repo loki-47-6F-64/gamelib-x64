@@ -43,6 +43,7 @@ along with gamelib-x64. If not, see <http://www.gnu.org/licenses/>.
 .global gameLoop
 .global write
 .global wait_for_debugger
+.global game_block_reset
 
 .global panic
 
@@ -134,6 +135,42 @@ write:
   popq %r13
   popq %r14
   popq %r15
+
+  movq %rbp, %rsp
+  popq %rbp
+
+  ret
+
+/**
+ * reset the origin of all blocks in the queue
+ * params:
+ *  (game_t*) game
+ */
+game_block_reset:
+  pushq %rbp
+  movq %rsp, %rbp
+
+  movq $0, %r11 # init counter
+
+  # r10 = block_t*
+  lea 8(%rdi), %r10 # game_t->queue
+
+1: # while x < BLOCK_QUEUE_SIZE
+  cmpq $BLOCK_QUEUE_SIZE, %r11
+  jnl 2f
+
+  movq $0, 40(%r10) # init flags (mirror and rotate)
+
+  lea (,%r11,4), %r9 # r9 = counter *4
+
+  movl $0, (%r10)
+  movl %r9d, 4(%r10) # block_t->origin = { 0, counter*4 }
+
+  addq $SIZE_OF_BLOCK_T, %r10
+  inc %r11
+
+  jmp 1b # next iteration
+2: # end loop
 
   movq %rbp, %rsp
   popq %rbp
