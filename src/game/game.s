@@ -17,12 +17,31 @@ You should have received a copy of the GNU General Public License
 along with gamelib-x64. If not, see <http://www.gnu.org/licenses/>.
 */
 
+
+# abi x764 linux :: http://www.x86-64.org/documentation/abi.pdf
+# Registers %rbp, %rbx, %r12 through %r15 belong to the caller
+# These registers must be restored before returning
+#
+#
+# The stack grows downwards from high addresses
+
+
+# At the entry of a function, (%rsp + 8) is a multiple of 16
+
+# args passing :: INTEGER
+#   0 .. 5
+#    rdi, rsi, rdx, rcx, r8, r9
+#   n .. 6
+#      push{l,q}
+.att_syntax
+
 .file "src/game/game.s"
 
 .include "src/game/debug_macro.s"
 
 .global gameInit
 .global gameLoop
+.global write
 .global wait_for_debugger
 
 .global panic
@@ -53,6 +72,73 @@ gameInit:
 
 gameLoop:
   jmp c_loop
+
+/**
+ * writes data to the screen
+ * params:
+ *  (screen_t*) screen -- the screen to write on. Could be NULL
+ *  (void*) in -- a pointer to the data to be written
+ *  (uint64_t) count -- the amount if bytes in the buffer
+ *  (int8_t) color
+ */
+write:
+  pushq %rbp
+  movq %rsp, %rbp
+
+  pushq %r15
+  pushq %r14
+  pushq %r13
+  pushq %r12
+  pushq %rbx
+
+  cmpq $0, %rdi
+  jne 1f # omit default screen
+
+  # default screen
+  movq $scr_full, %rdi
+1:
+
+  movq %rdi, %r15 # screen
+  movq %rsi, %r14 # in
+  movq %rdx, %r13 # count
+  movq %rcx, %r12 # color
+
+2: # while count > 0
+  cmpq $0, %r13 
+  jng 3f # break if count <= 0
+
+  movq %r15, %rdi
+  call screen_x
+  movq %rax, %rbx # tmp store x-coordinate
+
+  movq %r15, %rdi
+  call screen_y
+
+  movq %rbx, %rdi # x-coordinate
+  movq %rax, %rsi # y-coordiante
+  movzb (%r14), %rdx # *in
+  movq %r12, %rcx # color
+  call putChar
+
+  movq %r15, %rdi
+  call cursor_inc
+
+  inc %r14 # next *in
+  dec %r13 # next iteration
+
+  jmp 2b
+3: # end loop
+
+  popq %rbx
+  popq %r12
+  popq %r13
+  popq %r14
+  popq %r15
+
+  movq %rbp, %rsp
+  popq %rbp
+
+  ret
 
 /*
   Something unrecoverable happened
@@ -86,22 +172,3 @@ panic:
 panic_hlt:
   hlt
   jmp panic_hlt
-//	# Check if a key has been pressed
-//	call	readKeyCode
-//	cmpq	$0, %rax
-//	je		1f
-//	# If so, print a 'Y'
-//	movb	$'Y', %dl
-//	jmp		2f
-//
-//1:
-//	# Otherwise, print a 'N'
-//	movb	$'N', %dl
-//
-//2:
-//	movq	$0, %rdi
-//	movq	$0, %rsi
-//	movb	$0x0f, %cl
-//	call	putChar
-//
-//	ret

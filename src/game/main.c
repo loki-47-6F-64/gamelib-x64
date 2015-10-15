@@ -16,27 +16,27 @@ uint64_t game_state;
 
 void highscore_init();
 
-/**
- * writes data to the screen
- * params:
- *  buf -- a pointer to the data to be written
- *  count -- the amount if bytes in the buffer
- */
-void write(screen_t *scr, const void *buf, uint64_t count, uint8_t color) {
-  if(!scr) {
-    scr = &scr_full;
-  }
-
-  const char *data = buf;
-
-  for(uint64_t x = 0; x < count; ++x) {
-    putChar(screen_x(scr), screen_y(scr), data[x], color);
-
-    cursor_inc(scr);
-  }
-}
-
-
+// /**
+//  * writes data to the screen
+//  * params:
+//  *  buf -- a pointer to the data to be written
+//  *  count -- the amount if bytes in the buffer
+//  */
+// void write(screen_t *scr, const void *buf, uint64_t count, uint8_t color) {
+//   if(!scr) {
+//     scr = &scr_full;
+//   }
+// 
+//   const char *data = buf;
+// 
+//   for(uint64_t x = 0; x < count; ++x) {
+//     putChar(screen_x(scr), screen_y(scr), data[x], color);
+// 
+//     cursor_inc(scr);
+//   }
+// }
+// 
+// 
 /**
  * If it fits in the highscore, prepare the new highscore
  * params:
@@ -300,7 +300,6 @@ void c_init() {
   screen_init(&scr_full, 0, 0, SCREEN_SIZE_X, SCREEN_SIZE_Y);
   screen_clear(NULL, 0x00);
 
-  PANIC("SHIT!");
   c_menu_init();
 }
 
