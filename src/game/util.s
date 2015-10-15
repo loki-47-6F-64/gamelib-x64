@@ -25,6 +25,34 @@
 .global fromDigit
 .global strlen
 .global strcpy
+.global fill
+
+/**
+ * fills some memory with a value
+ * params:
+ *  (void*)   out -- buffer for value
+ *  (int8_t)  val -- the value that buffer is filled with
+ *  (uint64_t) count -- the amount of bytes in buffer
+ */
+fill:
+  pushq %rsp
+  movq %rsp, %rbp
+
+  movq $0, %r11 # init counter
+1: # while(counter < count)
+  cmpq %rdx, %r11
+  jae 2f
+
+  movb %sil, (%rdi, %r11) # move 'val' into 'out'
+  inc %r11
+
+  jmp 1b # next iteration
+
+2: # loop end
+  movq %rbp, %rsp
+  popq %rbp
+
+  ret
 
 /* convert integer to a string
  *

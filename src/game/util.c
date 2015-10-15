@@ -1,21 +1,21 @@
 #include "src/game/util.h"
 
-/**
- * fills some memory with a value
- * params:
- *  out -- buffer for value
- *  val -- the value that buffer is filled with
- *  count -- the amount of bytes in buffer
- */
-void fill(void *out, uint8_t val, uint64_t count) {
-  uint8_t *_out = out;
-
-  for(uint64_t x = 0; x < count; ++x) {
-    _out[x] = val;
-  }
-}
-
-
+// /**
+//  * fills some memory with a value
+//  * params:
+//  *  out -- buffer for value
+//  *  val -- the value that buffer is filled with
+//  *  count -- the amount of bytes in buffer
+//  */
+// void fill(void *out, uint8_t val, uint64_t count) {
+//   uint8_t *_out = out;
+// 
+//   for(uint64_t x = 0; x < count; ++x) {
+//     _out[x] = val;
+//   }
+// }
+// 
+// 
 // // returns ascii representation of the value
 // char fromDigit(char val) {
 //   return val + '0';
