@@ -55,6 +55,8 @@ uint_to_hex:
   movq $16, %rdx
   call fill # fill('out', '0', 16)
 
+  movq $16, %rcx # the base value
+
   movq %r15, %rax
   movq $bits_to_hex, %r9 # for use with indexing
 
@@ -64,8 +66,7 @@ uint_to_hex:
 
   # 'in' = 'in' / 10
   movq $0, %rdx
-  movq $16, %rcx
-  div %rcx # divides [%rax] by [rcx]
+  div %rcx # divides [%rdx:%rax] by [rcx]
   # result is put in %rax
   # remainder is put in %rdx
 
@@ -186,7 +187,7 @@ uint_to_string:
   movq %r15, %rax
   movq $0, %rdx
   movq $10, %rcx
-  div %rcx # divides %rcx by [%rdx:%rax]
+  div %rcx # divides [%rdx:%rax] by %rcx
   # result is put in %rax
   # remainder is put in %rdx
 
