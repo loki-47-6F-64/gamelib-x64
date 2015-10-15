@@ -300,6 +300,7 @@ void c_init() {
   screen_init(&scr_full, 0, 0, SCREEN_SIZE_X, SCREEN_SIZE_Y);
   screen_clear(NULL, 0x00);
 
+  PANIC("SHIT!");
   c_menu_init();
 }
 

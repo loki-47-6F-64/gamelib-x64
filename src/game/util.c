@@ -82,28 +82,28 @@
 //   reverse(out, size);
 //   return size;
 // }
-
-const char _bits[16] = {
-  '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'
-};
-
-/* convert 'in' into a string as an hexadecimal value
- *
- * out -- output for the string
- * in -- input for the string
- */
-void uint_to_hex(char *out, uint64_t in) {
-  fill(out, '0', 16);
-
-  char *out_p = out;
-  while(in) {
-    *out_p++ = _bits[in % 16];
-    in /= 16;
-  }
-
-
-  reverse(out, 16);
-}
+// 
+// const char _bits[16] = {
+//   '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'
+// };
+// 
+// /* convert 'in' into a string as a hexadecimal value
+//  *
+//  * out -- output for the string
+//  * in -- input for the string
+//  */
+// void uint_to_hex(char *out, uint64_t in) {
+//   fill(out, '0', 16);
+// 
+//   char *out_p = out;
+//   while(in) {
+//     *out_p++ = _bits[in % 16];
+//     in /= 16;
+//   }
+// 
+// 
+//   reverse(out, 16);
+// }
 // 
 // 
 // /**

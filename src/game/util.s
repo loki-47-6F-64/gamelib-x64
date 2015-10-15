@@ -17,6 +17,10 @@
 
 .include "src/game/debug_macro.s"
 
+.data
+
+bits_to_hex: .ascii "0123456789ABCDEF"
+
 .text
 
 .global int_to_string
@@ -26,6 +30,65 @@
 .global strlen
 .global strcpy
 .global fill
+.global uint_to_hex
+
+/* convert 'in' into a string as a hexadecimal value
+ * outputs in the form of: "0...000012AB"
+ * params:
+ *  (char*) out -- output for the string
+ *  (uint64_t) in -- input for the string
+ */
+uint_to_hex:
+  pushq %rbp
+  movq %rsp, %rbp
+
+  pushq %r15
+  pushq %r14
+  pushq %r13
+
+  movq %rsi, %r15 # save 'in'
+  movq %rdi, %r14 # save 'out'
+  movq %rdi, %r13 # initialize 'out_p'
+
+  # prepare hexdecimal result
+  movq $'0', %rsi
+  movq $16, %rdx
+  call fill # fill('out', '0', 16)
+
+  movq %r15, %rax
+  movq $bits_to_hex, %r9 # for use with indexing
+
+1: # while 'in' >= 0
+  cmpq $0, %rax
+  je 2f # break if ('in' == 0)
+
+  # 'in' = 'in' / 10
+  movq $0, %rdx
+  movq $16, %rcx
+  div %rcx # divides [%rax] by [rcx]
+  # result is put in %rax
+  # remainder is put in %rdx
+
+  movb (%r9, %rdx), %r8b
+  movb %r8b, (%r13) # bits_to_hex[remainder]
+
+  inc %r13 # '++out_p'
+
+  jmp 1b # continue loop
+
+2: # loop end
+  movq %r14, %rdi
+  movq $16, %rsi
+  call reverse # reverse('out', 16)
+
+  popq %r13
+  popq %r14
+  popq %r15
+
+  movq %rbp, %rsp
+  popq %rbp
+
+  ret
 
 /**
  * fills some memory with a value
@@ -35,7 +98,7 @@
  *  (uint64_t) count -- the amount of bytes in buffer
  */
 fill:
-  pushq %rsp
+  pushq %rbp
   movq %rsp, %rbp
 
   movq $0, %r11 # init counter
