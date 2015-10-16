@@ -160,19 +160,19 @@ void block_next(block_t *block) {
       break;
   }
 }
-
-/**
- * params:
- *  block -- the block to move
- *  x -- how much movement along x-axis
- *  y -- how much movement along y-axis
- */
-void block_mov(block_t *block, int32_t x, int32_t y) {
-  assert(block);
-
-  block->origin.x += x;
-  block->origin.y += y;
-}
+// 
+// /**
+//  * params:
+//  *  block -- the block to move
+//  *  x -- how much movement along x-axis
+//  *  y -- how much movement along y-axis
+//  */
+// void block_mov(block_t *block, int32_t x, int32_t y) {
+//   assert(block);
+// 
+//   block->origin.x += x;
+//   block->origin.y += y;
+// }
 // 
 // /**
 //  * (logically) rotates the block.

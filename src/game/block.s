@@ -20,6 +20,27 @@
 .text
 
 .global block_rotate
+.global block_mov
+
+/**
+ * params:
+ *  (block_t*) block -- the block to move
+ *  (int32_t) x -- how much movement along x-axis
+ *  (int32_t) y -- how much movement along y-axis
+ */
+block_mov:
+  pushq %rbp
+  movq %rsp, %rbp
+
+  assert $0, %rdi, block_mov_1, jne
+
+  addl %esi, (%rdi)  # origin.x + x
+  addl %edx, 4(%rdi) # origin + y
+
+  movq %rbp, %rsp
+  popq %rbp
+
+  ret
 
 /**
  * (logically) rotates the block.
