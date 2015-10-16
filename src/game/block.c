@@ -2,45 +2,45 @@
 #include "src/game/game.h"
 #include "src/game/util.h"
 
-/**
- * Convert points in block to real points
- * params:
- *  screen -- the screen the block is in
- *  in -- the points to put the result in
- *  out -- the block
- */
-void block_to_points(screen_t *screen, point_t *in, block_t *out) {
-  assert(screen && in && out);
-
-  const int32_t max = BLOCK_POINTS -1;
-  for(int x = 0; x < BLOCK_POINTS; ++x) {
-    if(out->rotate) {
-      // With rotation y-axis becomes x-axis and
-      // the x-axis becomes the mirror of the y-axis
-      in[x].x = max - out->point[x].y;
-      in[x].y = out->point[x].x;
-    }
-    else {
-      in[x].x = out->point[x].x;
-      in[x].y = out->point[x].y;
-    }
-
-    // A second rotation inverts x-axis and y-axis again,
-    // but it's mirrored relative to the original
-    if(out->mirror) {
-      //invert point
-      in[x].x = max - in[x].x;
-      in[x].y = max - in[x].y;
-    }
-
-    in[x].x += out->origin.x;
-    in[x].y += out->origin.y;
-    // Normalize result
-    normalize(screen, &in[x]);
-  }
-}
-
-
+// /**
+//  * Convert points in block to real points
+//  * params:
+//  *  screen -- the screen the block is in
+//  *  in -- the points to put the result in
+//  *  out -- the block
+//  */
+// void block_to_points(screen_t *screen, point_t *in, block_t *out) {
+//   assert(screen && in && out);
+// 
+//   const int32_t max = BLOCK_POINTS -1;
+//   for(int x = 0; x < BLOCK_POINTS; ++x) {
+//     if(out->rotate) {
+//       // With rotation y-axis becomes x-axis and
+//       // the x-axis becomes the mirror of the y-axis
+//       in[x].x = max - out->point[x].y;
+//       in[x].y = out->point[x].x;
+//     }
+//     else {
+//       in[x].x = out->point[x].x;
+//       in[x].y = out->point[x].y;
+//     }
+// 
+//     // A second rotation inverts x-axis and y-axis again,
+//     // but it's mirrored relative to the original
+//     if(out->mirror) {
+//       //invert point
+//       in[x].x = max - in[x].x;
+//       in[x].y = max - in[x].y;
+//     }
+// 
+//     in[x].x += out->origin.x;
+//     in[x].y += out->origin.y;
+//     // Normalize result
+//     normalize(screen, &in[x]);
+//   }
+// }
+// 
+// 
 /**
  * params:
  *  block  -- the block to draw
