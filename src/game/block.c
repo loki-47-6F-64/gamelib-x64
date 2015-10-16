@@ -41,29 +41,29 @@
 // }
 // 
 // 
-/**
- * params:
- *  block  -- the block to draw
- *  screen -- the screen to draw on
- */
-void block_draw(screen_t *screen, block_t *block) {
-  assert(screen && block);
-
-  point_t block_point[BLOCK_POINTS];
-  block_to_points(screen, block_point, block);
-
-  for(int x = 0; x < BLOCK_POINTS; ++x) {
-    point_t *tmp = &block_point[x];
-
-    char b = '#';
-    if(block->dealloc) {
-      b = '-';
-    }
-
-    putChar(screen->first.x + tmp->x, screen->first.y + tmp->y, b, 0x07);
-  }
-}
-
+// /**
+//  * params:
+//  *  block  -- the block to draw
+//  *  screen -- the screen to draw on
+//  */
+// void block_draw(screen_t *screen, block_t *block) {
+//   assert(screen && block);
+// 
+//   point_t block_point[BLOCK_POINTS];
+//   block_to_points(screen, block_point, block);
+// 
+//   for(int x = 0; x < BLOCK_POINTS; ++x) {
+//     point_t *tmp = &block_point[x];
+// 
+//     char b = '#';
+//     if(block->dealloc) {
+//       b = '-';
+//     }
+// 
+//     putChar(screen->first.x + tmp->x, screen->first.y + tmp->y, b, 0x07);
+//   }
+// }
+// 
 void block_square(block_t *block) {
   point_t *p = block->point;
 

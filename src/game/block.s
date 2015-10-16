@@ -23,6 +23,71 @@
 .global block_mov
 .global block_next
 .global block_to_points
+.global block_draw
+
+/**
+ * params:
+ *  (screen_t*) screen -- the block to draw
+ *  (block_t*) block -- the screen to draw on
+ */
+block_draw:
+  pushq %rbp
+  movq %rsp, %rbp
+
+  assert $0, %rdi, block_draw_1, jne
+  assert $0, %rsi, block_draw_2, jne
+
+  subq $8*BLOCK_POINTS, %rsp # init block_point
+
+  pushq %r15
+  pushq %r14
+  pushq %r13
+
+  movq %rdi, %r15 # screen
+  movq %rsi, %r14 # block
+  movq $0, %r13 # init counter
+
+  movq %r15, %rdi # screen
+  lea -8*BLOCK_POINTS(%rbp), %rsi
+  movq %r14, %rdx # block
+  call block_to_points
+
+
+1: # while counter < BLOCK_POITS
+  lea -8*BLOCK_POINTS(%rbp, %r13, 8), %r11 # &block_point[x]
+
+  cmpq $0, SIZE_OF_BLOCK_T-8(%r14)
+  movq $'#', %rdx
+  je 2f
+
+  movq $'-', %rdx
+2: # endif
+
+  movq $0x07, %rcx # color
+
+  
+  movq $0, %rdi
+  movq $0, %rsi
+  movl (%r15), %edi   # screen->first.x
+  movl 4(%r15), %esi  # screen->first.y
+  addl (%r11), %edi  # x += tmp->x
+  addl 4(%r11), %esi # y += tmp->y
+
+  call putChar
+
+  inc %r13 # next iteration
+  cmpq $BLOCK_POINTS, %r13
+  jl 1b
+
+# end loop
+  popq %r13
+  popq %r14
+  popq %r15
+
+  movq %rbp, %rsp
+  popq %rbp
+
+  ret
 
 /**
  * Convert points in block to real points
