@@ -183,7 +183,7 @@ void c_menu_init() {
 
   screen_clear(NULL, 0x00);
 
-  writef(NULL, "sizeof(game_t) == %d", sizeof(game));
+  writef(NULL, "sizeof(game_t) == %d", sizeof(field_t));
 
   writef(&middle,
       "Please select the %capplication%c to run.%n%n%n"
@@ -327,22 +327,22 @@ void c_init() {
 //   game->timer = 6 * TICKS_PER_SEC;
 // }
 // 
-/**
- * params:
- *  game -- the game to draw
- */
-void game_draw(game_t *game) {
-  field_draw(&game->field);
-
-  screen_clear(&game->block_screen, 0x30);
-  for(int x = 0; x < BLOCK_QUEUE_SIZE; ++x) {
-    if(game->player != (game->queue + x)) {
-      block_draw(&game->block_screen, &game->queue[x]);
-    }
-  }
-
-  field_block_draw(&game->field, game->player);
-}
+// /**
+//  * params:
+//  *  game -- the game to draw
+//  */
+// void game_draw(game_t *game) {
+//   field_draw(&game->field);
+// 
+//   screen_clear(&game->block_screen, 0x30);
+//   for(int x = 0; x < BLOCK_QUEUE_SIZE; ++x) {
+//     if(game->player != (game->queue + x)) {
+//       block_draw(&game->block_screen, &game->queue[x]);
+//     }
+//   }
+// 
+//   field_block_draw(&game->field, game->player);
+// }
 // 
 // /**
 //  * reset the origin of all blocks in the queue

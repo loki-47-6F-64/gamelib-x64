@@ -45,6 +45,7 @@ along with gamelib-x64. If not, see <http://www.gnu.org/licenses/>.
 .global wait_for_debugger
 .global game_block_reset
 .global game_next
+.global game_draw
 
 .global panic
 
@@ -148,6 +149,58 @@ write:
  *  (game_t*) game -- the game to draw
  */
 game_draw:
+  pushq %rbp
+  movq %rsp, %rbp
+
+  pushq %r15
+  pushq %r14
+  pushq %r13
+
+  movq %rdi, %r15   # game
+  movq (%rdi), %r14 # game->player
+  
+  # load &game->field
+  lea (SIZE_OF_BLOCK_T*BLOCK_QUEUE_SIZE)+8(%rdi), %rdi
+  call field_draw
+
+  # Make sure the background has the proper color
+  # load &game->block_screen
+  lea (SIZE_OF_BLOCK_T*BLOCK_QUEUE_SIZE)+SIZE_OF_FIELD_T+8(%r15), %rdi
+  movq $0x30, %rsi # background color for the screen
+  call screen_clear
+
+  movq $0, %r13 # counter
+1: # while counter < BLOCK_QUEUE_SIZE
+  lea 8(%r15, %r13), %r11
+  cmpq %r11, %r14
+  je 2f # skip drawing block if it is the player
+
+  # load &game->block_screen
+  lea (SIZE_OF_BLOCK_T*BLOCK_QUEUE_SIZE)+SIZE_OF_FIELD_T+8(%r15), %rdi
+  lea 8(%r15, %r13), %rsi
+  call block_draw
+
+2: # decide next iteration
+  addq $SIZE_OF_BLOCK_T, %r13
+
+  cmpq $SIZE_OF_BLOCK_T*BLOCK_QUEUE_SIZE, %r13
+  jl 1b
+# end loop
+
+  # Finally, we can draw the field
+  # load &game->field
+  lea (SIZE_OF_BLOCK_T*BLOCK_QUEUE_SIZE)+8(%r15), %rdi
+  movq %r14, %rsi # game->player
+  call field_block_draw
+
+  popq %r13
+  popq %r14
+  popq %r15
+
+  movq %rbp, %rsp
+  popq %rbp
+
+  ret
 
 /**
  * A block has been placed, it is time for a new block.
