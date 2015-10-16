@@ -24,6 +24,91 @@
 .global block_next
 .global block_to_points
 .global block_draw
+.global block_square
+.global block_pole
+.global block_hook
+.global block_stage
+
+# (block_t*) block
+block_square:
+  pushq %rbp
+  movq %rsp, %rbp
+
+  lea 8(%rdi), %r11
+
+  movl $1, (%r11)
+  movl $1, 4(%r11)
+  movl $2, 8(%r11)
+  movl $2, 12(%r11)
+  movl $1, 16(%r11)
+  movl $2, 20(%r11)
+  movl $2, 24(%r11)
+  movl $1, 28(%r11)
+
+  movq %rbp, %rsp
+  popq %rbp
+
+  ret
+
+block_pole:
+  pushq %rbp
+  movq %rsp, %rbp
+
+  lea 8(%rdi), %r11
+
+  movl $1, (%r11)
+  movl $0, 4(%r11)
+  movl $1, 8(%r11)
+  movl $1, 12(%r11)
+  movl $1, 16(%r11)
+  movl $2, 20(%r11)
+  movl $1, 24(%r11)
+  movl $3, 28(%r11)
+
+  movq %rbp, %rsp
+  popq %rbp
+
+  ret
+
+block_hook:
+  pushq %rbp
+  movq %rsp, %rbp
+
+  lea 8(%rdi), %r11
+
+  movl $0, (%r11)
+  movl $1, 4(%r11)
+  movl $1, 8(%r11)
+  movl $1, 12(%r11)
+  movl $1, 16(%r11)
+  movl $0, 20(%r11)
+  movl $2, 24(%r11)
+  movl $0, 28(%r11)
+
+  movq %rbp, %rsp
+  popq %rbp
+
+  ret
+
+block_stage:
+  pushq %rbp
+  movq %rsp, %rbp
+
+  lea 8(%rdi), %r11
+
+  movl $3, (%r11)
+  movl $3, 4(%r11)
+  movl $2, 8(%r11)
+  movl $3, 12(%r11)
+  movl $1, 16(%r11)
+  movl $3, 20(%r11)
+  movl $2, 24(%r11)
+  movl $2, 28(%r11)
+
+  movq %rbp, %rsp
+  popq %rbp
+
+  ret
 
 /**
  * params:

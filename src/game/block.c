@@ -64,70 +64,70 @@
 //   }
 // }
 // 
-void block_square(block_t *block) {
-  point_t *p = block->point;
-
-  p[0].x = 1;
-  p[0].y = 1;
-
-  p[1].x = 2;
-  p[1].y = 2;
-
-  p[2].x = 1;
-  p[2].y = 2;
-
-  p[3].x = 2;
-  p[3].y = 1;
-}
-
-void block_pole(block_t *block) {
-  point_t *p = block->point;
-
-  p[0].x = 1;
-  p[0].y = 0;
-
-  p[1].x = 1;
-  p[1].y = 1;
-
-  p[2].x = 1;
-  p[2].y = 2;
-
-  p[3].x = 1;
-  p[3].y = 3;
-
-}
-
-void block_hook(block_t *block) {
-  point_t *p = block->point;
-
-  p[0].x = 0;
-  p[0].y = 1;
-
-  p[1].x = 1;
-  p[1].y = 1;
-
-  p[2].x = 1;
-  p[2].y = 0;
-
-  p[3].x = 2;
-  p[3].y = 0;
-}
-
-void block_stage(block_t *block) {
-  point_t *p = block->point;
-
-  p[0].x = 3;
-  p[0].y = 3;
-
-  p[1].x = 2;
-  p[1].y = 3;
-
-  p[2].x = 1;
-  p[2].y = 3;
-
-  p[3].x = 2;
-  p[3].y = 2;
-}
+// void block_square(block_t *block) {
+//   point_t *p = block->point;
+// 
+//   p[0].x = 1;
+//   p[0].y = 1;
+// 
+//   p[1].x = 2;
+//   p[1].y = 2;
+// 
+//   p[2].x = 1;
+//   p[2].y = 2;
+// 
+//   p[3].x = 2;
+//   p[3].y = 1;
+// }
+// 
+// void block_pole(block_t *block) {
+//   point_t *p = block->point;
+// 
+//   p[0].x = 1;
+//   p[0].y = 0;
+// 
+//   p[1].x = 1;
+//   p[1].y = 1;
+// 
+//   p[2].x = 1;
+//   p[2].y = 2;
+// 
+//   p[3].x = 1;
+//   p[3].y = 3;
+// 
+// }
+// 
+// void block_hook(block_t *block) {
+//   point_t *p = block->point;
+// 
+//   p[0].x = 0;
+//   p[0].y = 1;
+// 
+//   p[1].x = 1;
+//   p[1].y = 1;
+// 
+//   p[2].x = 1;
+//   p[2].y = 0;
+// 
+//   p[3].x = 2;
+//   p[3].y = 0;
+// }
+// 
+// void block_stage(block_t *block) {
+//   point_t *p = block->point;
+// 
+//   p[0].x = 3;
+//   p[0].y = 3;
+// 
+//   p[1].x = 2;
+//   p[1].y = 3;
+// 
+//   p[2].x = 1;
+//   p[2].y = 3;
+// 
+//   p[3].x = 2;
+//   p[3].y = 2;
+// }
 // 
 // /**
 //  * puts random positions in the block
