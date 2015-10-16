@@ -173,24 +173,24 @@ void block_mov(block_t *block, int32_t x, int32_t y) {
   block->origin.x += x;
   block->origin.y += y;
 }
-
-/**
- * (logically) rotates the block.
- * params:
- *  block -- the block to rotate
- */
-void block_rotate(block_t *block) {
-  assert(block);
-
-  if(block->rotate) {
-    // complement mirror
-    block->mirror = 1 - block->mirror;
-
-    block->rotate = 0;
-  }
-  else {
-    block->rotate = 1;
-  }
-}
-
-
+// 
+// /**
+//  * (logically) rotates the block.
+//  * params:
+//  *  block -- the block to rotate
+//  */
+// void block_rotate(block_t *block) {
+//   assert(block);
+// 
+//   if(block->rotate) {
+//     // complement mirror
+//     block->mirror = 1 - block->mirror;
+// 
+//     block->rotate = 0;
+//   }
+//   else {
+//     block->rotate = 1;
+//   }
+// }
+// 
+// 
