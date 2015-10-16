@@ -128,38 +128,38 @@ void block_stage(block_t *block) {
   p[3].x = 2;
   p[3].y = 2;
 }
-
-/**
- * puts random positions in the block
- * params:
- *  block -- the block that get initialized
- */
-void block_next(block_t *block) {
-  assert(block);
-
-  block->dealloc = 0;
-  uint64_t type = rand_next() % 20;
-  if(type > 16) {
-    // Deallocation block
-    block->dealloc = 1;
-  }
-
-  type = (type +1) % 4;
-  switch(type) {
-    case 0:
-      block_square(block);
-      break;
-    case 1:
-      block_pole(block);
-      break;
-    case 2:
-      block_hook(block);
-      break;
-    case 3:
-      block_stage(block);
-      break;
-  }
-}
+// 
+// /**
+//  * puts random positions in the block
+//  * params:
+//  *  block -- the block that get initialized
+//  */
+// void block_next(block_t *block) {
+//   assert(block);
+// 
+//   block->dealloc = 0;
+//   uint64_t type = rand_next() % 20;
+//   if(type > 16) {
+//     // Deallocation block
+//     block->dealloc = 1;
+//   }
+// 
+//   type = (type +1) % 4;
+//   switch(type) {
+//     case 0:
+//       block_square(block);
+//       break;
+//     case 1:
+//       block_pole(block);
+//       break;
+//     case 2:
+//       block_hook(block);
+//       break;
+//     case 3:
+//       block_stage(block);
+//       break;
+//   }
+// }
 // 
 // /**
 //  * params:

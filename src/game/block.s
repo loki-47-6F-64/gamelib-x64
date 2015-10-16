@@ -21,6 +21,49 @@
 
 .global block_rotate
 .global block_mov
+.global block_next
+
+/**
+ * puts random positions in the block
+ * params:
+ *  (block_t*) block -- the block that get initialized
+ */
+block_next:
+  pushq %rbp
+  movq %rsp, %rbp
+
+  pushq %r15
+
+  assert $0, %rdi, block_next_1, jne
+
+  movq %rdi, %r15
+  # block->dealloc might be non-zero, make sure it's 0
+  movl $0, SIZE_OF_BLOCK_T-8(%r15)
+
+  # get next random value and put it in rax
+  call rand_next
+  movq $0, %rdx
+
+  movq $4, %r10
+  div %r10
+
+  movq block_next_switch(,%rdx,8), %r10
+
+  call *%r10
+.data # make sure it doesn't get mixed with instructions
+block_next_switch:
+  .quad block_square
+  .quad block_pole
+  .quad block_hook
+  .quad block_stage
+.text
+  
+  popq %r15
+
+  movq %rbp, %rsp
+  popq %rbp
+
+  ret
 
 /**
  * params:
