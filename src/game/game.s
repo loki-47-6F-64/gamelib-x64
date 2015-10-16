@@ -44,6 +44,7 @@ along with gamelib-x64. If not, see <http://www.gnu.org/licenses/>.
 .global write
 .global wait_for_debugger
 .global game_block_reset
+.global game_next
 
 .global panic
 
@@ -133,6 +134,60 @@ write:
   popq %rbx
   popq %r12
   popq %r13
+  popq %r14
+  popq %r15
+
+  movq %rbp, %rsp
+  popq %rbp
+
+  ret
+
+/**
+ * Handles the drawing part of the game
+ * params:
+ *  (game_t*) game -- the game to draw
+ */
+game_draw:
+
+/**
+ * A block has been placed, it is time for a new block.
+ * Oh... and the timer needs to be reset, I guess..
+ * params:
+ *  (game_t*) game
+ */
+game_next:
+  pushq %rbp
+  movq %rsp, %rbp
+
+  assert $0, %rdi, game_draw_1, jne
+
+  pushq %r15
+  pushq %r14
+
+  movq %rdi, %r15 # game
+  movq (%rdi), %r14 # game->player
+  
+  # rdi already contains correct value
+  call game_block_reset
+
+  movq %r14, %rdi # game->player
+  call block_next # place pseudo-random block in queue
+
+  addq $SIZE_OF_BLOCK_T, %r14 # player = next block
+
+  # game->queue + BLOCK_QUEUE_SIZE
+  lea (SIZE_OF_BLOCK_T*BLOCK_QUEUE_SIZE)+8(%r15), %r11
+  cmpq %r11, %r14
+  jb 1f
+
+  lea 8(%r15), %r14 # game->player = start of queue
+
+1: # proper value for game->player
+  movq %r14, (%r15) # store new game->player
+  
+  # reset timer
+  movq $6*TICKS_PER_SEC, SIZE_OF_GAME_T-16(%r15)
+
   popq %r14
   popq %r15
 

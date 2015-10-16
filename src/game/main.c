@@ -183,7 +183,7 @@ void c_menu_init() {
 
   screen_clear(NULL, 0x00);
 
-  writef(NULL, "sizeof(block_t) == %d", sizeof(game.queue));
+  writef(NULL, "sizeof(game_t) == %d", sizeof(game));
 
   writef(&middle,
       "Please select the %capplication%c to run.%n%n%n"
@@ -304,27 +304,29 @@ void c_init() {
 
   c_menu_init();
 }
-
-
-/**
- * A block has been placed, it is time for a new block.
- * Oh... and the timer needs to be reset, I guess..
- */
-void game_next(game_t *game) {
-  assert(game);
-
-  game_block_reset(game);
-  block_next(game->player);
-
-  // next block in queue
-  ++game->player;
-  if(game->player >= (game->queue + BLOCK_QUEUE_SIZE)) {
-    game->player = game->queue;
-  }
-
-  game->timer = 6 * TICKS_PER_SEC;
-}
-
+// 
+// 
+// /**
+//  * A block has been placed, it is time for a new block.
+//  * Oh... and the timer needs to be reset, I guess..
+//  * params:
+//  *  game
+//  */
+// void game_next(game_t *game) {
+//   assert(game);
+// 
+//   game_block_reset(game);
+//   block_next(game->player);
+// 
+//   // next block in queue
+//   ++game->player;
+//   if(game->player >= (game->queue + BLOCK_QUEUE_SIZE)) {
+//     game->player = game->queue;
+//   }
+// 
+//   game->timer = 6 * TICKS_PER_SEC;
+// }
+// 
 /**
  * params:
  *  game -- the game to draw

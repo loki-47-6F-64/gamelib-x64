@@ -2,11 +2,40 @@
 
 .ifndef GAME_DEBUG_H
 
+.set TICKS_PER_SEC, 60 # Hz
+
+.set KEY_CODE_W, 0x11 
+.set KEY_CODE_S, 0x1F
+.set KEY_CODE_A, 0x1E
+.set KEY_CODE_D, 0x20
+
+.set KEY_CODE_1, 2
+.set KEY_CODE_2, 3
+.set KEY_CODE_3, 4
+
+.set KEY_CODE_ENT, 0x1C
+
+.set KEY_CODE_AU, 72
+.set KEY_CODE_AD, 80
+.set KEY_CODE_AL, 75
+.set KEY_CODE_AR, 77
+
+
+.set BLOCK_POINTS, 4
+
 .set SCREEN_SIZE_X, 80
 .set SCREEN_SIZE_Y, 25
 
 .set BLOCK_QUEUE_SIZE, 4
+.set SCORE_SIZE, 10
 
+.set STATE_SUSPEND, 0
+.set STATE_MENU, 1
+.set STATE_GAME, 2
+.set STATE_HIGHSCORE, 3
+.set STATE_NEW_HIGHSCORE, 4
+
+.set SIZE_OF_GAME_T, 856
 .set SIZE_OF_BLOCK_T, 52
 
 .set GAME_DEBUG_H, $1
