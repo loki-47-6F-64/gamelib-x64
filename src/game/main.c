@@ -15,7 +15,7 @@ game_t game;
 uint64_t game_state;
 
 void highscore_init();
-
+void menu_init();
 /**
  * If it fits in the highscore, prepare the new highscore
  * params:
@@ -183,24 +183,24 @@ void c_game_loop() {
       "Your current score: %c%u",
       0xCF, game.timer / TICKS_PER_SEC +1, 0x07, 0x2F, game.score);
 }
-
-void c_menu_init() {
-  screen_t middle;
-  screen_init(&middle, 20, 5, 40, 15);
-
-  screen_clear(NULL, 0x00);
-
-  writef(NULL, "sizeof(game_t) == %d", sizeof(field_t));
-
-  writef(&middle,
-      "Please select the %capplication%c to run.%n%n%n"
-      "[1] :: %cGame%c%n%n"
-      "[2] :: %cHighscore",
-      0xCF, 0x07, 0x4F, 0x07, 0x4F
-  );
-
-  game_state = STATE_MENU;
-}
+// 
+// void menu_init() {
+//   screen_t middle;
+//   screen_init(&middle, 20, 5, 40, 15);
+// 
+//   screen_clear(NULL, 0x00);
+// 
+//   writef(NULL, "sizeof(game_t) == %d", sizeof(field_t));
+// 
+//   writef(&middle,
+//       "Please select the %capplication%c to run.%n%n%n"
+//       "[1] :: %cGame%c%n%n"
+//       "[2] :: %cHighscore",
+//       0xCF, 0x07, 0x4F, 0x07, 0x4F
+//   );
+// 
+//   game_state = STATE_MENU;
+// }
 // 
 // void highscore_init() {
 //   screen_clear(NULL, 0x00);
@@ -278,7 +278,7 @@ void highscore_loop() {
   uint64_t ascii = readKeyCode();
 
   if(ascii == KEY_CODE_ENT) {
-    c_menu_init();
+    menu_init();
   }
 }
 
@@ -309,7 +309,7 @@ void c_init() {
   screen_init(&scr_full, 0, 0, SCREEN_SIZE_X, SCREEN_SIZE_Y);
   screen_clear(NULL, 0x00);
 
-  c_menu_init();
+  menu_init();
 }
 // 
 // 

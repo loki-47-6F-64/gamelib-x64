@@ -47,6 +47,7 @@ along with gamelib-x64. If not, see <http://www.gnu.org/licenses/>.
 .global game_next
 .global game_draw
 .global game_init
+.global menu_init
 .global new_highscore_init
 .global highscore_init
 
@@ -78,6 +79,45 @@ gameInit:
 
 gameLoop:
   jmp c_loop
+
+# initialize the menu
+menu_init:
+  pushq %rbp
+  movq %rsp, %rbp
+ 
+  subq $SIZE_OF_SCREEN_T, %rsp
+  movq %rsp, %rdi # screen_t*
+  movq $20, %rsi  # x
+  movq $5, %rdx   # y
+  movq $40, %rcx  # width
+  movq $15, %r8   # height
+  call screen_init
+
+  movq $0, %rdi
+  movq $0x00, %rsi
+  call screen_clear
+
+.data
+menu_init_f:
+  .ascii  "Please select the %capplication%c to run.%n%n%n"
+  .ascii  "[1] :: %cGame%c%n%n"
+  .string "[2] :: %cHighscore"
+.text
+  movq %rsp, %rdi
+  movq $menu_init_f, %rsi  
+  movq $0xCF, %rdx
+  movq $0x07, %rcx
+  movq $0x4F, %r8
+  movq $0x07, %r9
+  pushq $0x4F
+  call writef
+
+  movq $STATE_MENU, game_state
+
+  movq %rbp, %rsp
+  popq %rbp
+
+  ret
 
 # initialize the game
 game_init:
