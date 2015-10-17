@@ -229,8 +229,6 @@ void menu_loop() {
   uint64_t ascii = readKeyCode();
 
   seed = (seed +1) % (1 << 31);
-  screen_t middle;
-  screen_init(&middle, 25, 5, 25, 15);
 
   if(ascii) {
     switch(ascii) {

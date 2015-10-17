@@ -103,6 +103,50 @@ gameInit:
 gameLoop:
   jmp c_loop
 
+
+menu_loop:
+  pushq %rbp
+  movq %rsp, %rbp 
+
+  # use iterations in the menu as seed for the rng
+  # seed = (seed +1) % (2^31)
+  movq $0, %rdx
+  movq seed, %rax
+  movq $(1<<31), %r11
+
+  div %r11
+  movq %rdx, seed
+  
+#  subq $SIZE_OF_SCREEN_T, %rsp
+#  movq %rsp, %rdi # screen_t*
+#  movq $25, %rsi  # x
+#  movq $5, %rdx   # y
+#  movq $25, %rcx  # width
+#  movq $15, %r8   # height
+#  call screen_init
+
+  call readKeyCode
+  
+  cmpq $KEY_CODE_1, %rax
+  je 1f
+
+  cmpq $KEY_CODE_1, %rax
+  je 2f
+
+  jmp 9f
+1: # KEY_CODE_1
+  pushq 9f
+  jmp game_init
+2: # KEY_CODE_2
+  call highscore_init
+
+9: # return
+  movq %rbp, %rsp
+  popq %rbp
+
+  ret
+
+# not to be mistaken for gameLoop
 game_loop:
   pushq %rbp
   movq %rsp, %rbp
