@@ -70,8 +70,22 @@ gameInit:
   pushq %rbp
   movq %rsp, %rbp
 
-  call c_init
+  movq $19886, %rdi
+  call setTimer
 
+  movq $scr_full, %rdi
+  movq $0, %rsi
+  movq $0, %rdx
+  movq $SCREEN_SIZE_X, %rcx
+  movq $SCREEN_SIZE_Y, %r8
+  call screen_init
+
+  movq $0, %rdi
+  movq $0, %rsi
+  call screen_clear
+
+  call menu_init
+  
   movq %rbp, %rsp
   popq %rbp
 
