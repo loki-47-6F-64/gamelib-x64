@@ -285,12 +285,29 @@ block_next:
   movl $0, SIZE_OF_BLOCK_T-8(%r15)
 
   # get next random value and put it in rax
+  pushq %rdi
   call rand_next
-  movq $0, %rdx
+  popq %rdi
 
-  movq $4, %r10
+  movq $0, %rdx
+  movq $20, %r10
   div %r10
 
+  # not a deallocation block by default
+  movl $0, SIZE_OF_BLOCK_T-4(%rdi)
+  cmpq $16, %rdx
+  jle 1f # no deallocation block
+
+  # the block is a deallocation block
+  movl $1, SIZE_OF_BLOCK_T-4(%rdi)
+
+1:
+  movq $4, %r10
+  movq %rdx, %rax
+  incq %rax
+
+  movq $0, %rdx
+  div %r10
   movq block_next_switch(,%rdx,8), %r10
 
   call *%r10
