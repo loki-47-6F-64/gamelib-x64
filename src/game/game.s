@@ -102,8 +102,26 @@ gameInit:
   ret
 
 gameLoop:
-  jmp c_loop
+  pushq %rbp
+  movq %rsp, %rbp
 
+# jumptable
+  movq game_state, %r11
+  movq gameLoop_switch(,%r11,8), %r11
+
+.data
+gameLoop_switch:
+  .quad menu_loop # handle menuplay
+  .quad game_loop # handle gameplay
+  .quad highscore_loop # display highscore
+  .quad new_highscore_loop # record new highscore
+.text
+  call *%r11
+
+  movq %rbp, %rsp
+  popq %rbp
+
+  ret
 
 highscore_loop:
   pushq %rbp

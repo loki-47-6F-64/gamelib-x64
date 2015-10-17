@@ -116,22 +116,22 @@ void game_loop();
 //   game_state = STATE_GAME;
 // }
 // 
-uint64_t seed = 973;
-uint64_t rand_next() {
-  // wiki https://en.wikipedia.org/wiki/Linear_congruential_generator
-  // X<n+1> = (aX<n> + c) mod m
-  // 0 <= X<0> < m
-  // m and c are relatively prime
-  // a - 1 is divisible by all primefactors of m
-  // a - 1 is divisible by 4 if m is divisible by 4
-  const uint64_t a = 1103515245;
-  const uint64_t c = 12345;
-  const uint64_t m = 1 << 31;
-
-  seed = (a*seed + c) % m;
-
-  return seed;
-}
+// uint64_t seed = 973;
+// uint64_t rand_next() {
+//   // wiki https://en.wikipedia.org/wiki/Linear_congruential_generator
+//   // X<n+1> = (aX<n> + c) mod m
+//   // 0 <= X<0> < m
+//   // m and c are relatively prime
+//   // a - 1 is divisible by all primefactors of m
+//   // a - 1 is divisible by 4 if m is divisible by 4
+//   const uint64_t a = 1103515245;
+//   const uint64_t c = 12345;
+//   const uint64_t m = 1 << 31;
+// 
+//   seed = (a*seed + c) % m;
+// 
+//   return seed;
+// }
 // 
 // void game_loop() {
 //   int64_t ascii = readKeyCode();
@@ -285,22 +285,22 @@ uint64_t rand_next() {
 //   }
 // }
 // 
-void c_loop() {
-  switch(game_state) {
-    case STATE_MENU:
-      menu_loop();
-      break;
-    case STATE_GAME:
-      game_loop();
-      break;
-    case STATE_HIGHSCORE:
-      highscore_loop();
-      break;
-    case STATE_NEW_HIGHSCORE:
-      new_highscore_loop();
-      break;
-  }
-}
+// void c_loop() {
+//   switch(game_state) {
+//     case STATE_MENU:
+//       menu_loop();
+//       break;
+//     case STATE_GAME:
+//       game_loop();
+//       break;
+//     case STATE_HIGHSCORE:
+//       highscore_loop();
+//       break;
+//     case STATE_NEW_HIGHSCORE:
+//       new_highscore_loop();
+//       break;
+//   }
+// }
 // 
 // /**
 //  * initializes any global vars
