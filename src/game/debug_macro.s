@@ -38,6 +38,7 @@
 .set SIZE_OF_GAME_T, 856
 .set SIZE_OF_BLOCK_T, 52
 .set SIZE_OF_FIELD_T, 600
+.set SIZE_OF_SCORE_T, 12
 
 .set GAME_DEBUG_H, $1
 

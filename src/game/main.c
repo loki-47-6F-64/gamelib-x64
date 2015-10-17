@@ -16,6 +16,13 @@ uint64_t game_state;
 
 void highscore_init();
 
+/**
+ * If it fits in the highscore, prepare the new highscore
+ * params:
+ *  score -- the new highscore
+ */
+void new_highscore_init(uint64_t new_score);
+
 // /**
 //  * writes data to the screen
 //  * params:
@@ -37,46 +44,46 @@ void highscore_init();
 // }
 // 
 // 
-/**
- * If it fits in the highscore, prepare the new highscore
- * params:
- *  score -- the new highscore
- */
-void new_highscore_init(uint64_t new_score) {
-  screen_clear(NULL, 0x00);
-
-  int x;
-  for(x = 0; x < SCORE_SIZE; ++x) {
-    if(new_score > score[x].score) {
-      break; // new highscore, and there is a spot
-    }
-  }
-
-  if(x == SCORE_SIZE) {
-    highscore_init();
-    return; // no new highscore
-  }
-
-  // Insert new highscore
-  for(int y = SCORE_SIZE -1; y > x; --y) {
-    score[y] = score[y -1];
-  }
-
-  // prepare initial values of the name
-  char *name = score[x].name;
-  name[0] = 'A';
-  name[1] = 'A';
-  name[2] = 'A';
-  name[3] = '\0';
-
-  score[x].score = new_score;
-
-  new_highscore.score = &score[x];
-  new_highscore.name_p = name;
-
-  game_state = STATE_NEW_HIGHSCORE;
-}
-
+// /**
+//  * If it fits in the highscore, prepare the new highscore
+//  * params:
+//  *  score -- the new highscore
+//  */
+// void new_highscore_init(uint64_t new_score) {
+//   screen_clear(NULL, 0x00);
+// 
+//   int x;
+//   for(x = 0; x < SCORE_SIZE; ++x) {
+//     if(new_score > score[x].score) {
+//       break; // new highscore, and there is a spot
+//     }
+//   }
+// 
+//   if(x == SCORE_SIZE) {
+//     highscore_init();
+//     return; // no new highscore
+//   }
+// 
+//   // Insert new highscore
+//   for(int y = SCORE_SIZE -1; y > x; --y) {
+//     score[y] = score[y -1];
+//   }
+// 
+//   // prepare initial values of the name
+//   char *name = score[x].name;
+//   name[0] = 'A';
+//   name[1] = 'A';
+//   name[2] = 'A';
+//   name[3] = '\0';
+// 
+//   score[x].score = new_score;
+// 
+//   new_highscore.score = &score[x];
+//   new_highscore.name_p = name;
+// 
+//   game_state = STATE_NEW_HIGHSCORE;
+// }
+// 
 /**
  * initialize the game
  */

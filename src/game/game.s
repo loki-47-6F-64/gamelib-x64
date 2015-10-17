@@ -46,6 +46,7 @@ along with gamelib-x64. If not, see <http://www.gnu.org/licenses/>.
 .global game_block_reset
 .global game_next
 .global game_draw
+.global new_highscore_init
 
 .global panic
 
@@ -75,6 +76,75 @@ gameInit:
 
 gameLoop:
   jmp c_loop
+
+/**
+ * If it fits in the highscore, prepare the new highscore
+ * params:
+ *  (uint64_t) new_score -- the new highscore
+ */
+new_highscore_init:
+  pushq %rbp
+  movq %rsp, %rbp
+
+  # First clear screen
+  pushq %rdi
+  movq $0, %rdi # screen
+  movq $0, %rsi # color black
+  call screen_clear
+  popq %rdi
+
+  # First, aquire the correct position for the new score
+  movq $0, %r11 # init counter
+1: # while counter < SCORE_SIZE
+  cmpq score+4(%r11), %rdi
+  jg 2f # break if new_score > score[counter].score
+  
+  addq $SIZE_OF_SCORE_T, %r11
+  cmpq $SCORE_SIZE*SIZE_OF_SCORE_T, %r11
+  jl 1b
+2: # end loop
+  
+  cmpq $SCORE_SIZE*SIZE_OF_SCORE_T, %r11
+  jne 3f # don't return yet
+
+  # no new highscore to the highscore
+  call highscore_init
+  jmp 9f # return
+3: # endif
+  movq $(SCORE_SIZE-1)*SIZE_OF_SCORE_T, %r10 # init counter_y
+4: # while counter_y > counter_x
+  cmpq %r11, %r10
+  jng 5f
+
+  lea score(%r10), %r9    # score[counter_y]
+  lea score-SIZE_OF_SCORE_T(%r10), %r8 # score[counter_y -1]
+
+  # score[counter_y] = score[counter_y -1]
+  movl (%r8), %esi # tmp
+  movl %esi, (%r9)
+
+  movq 4(%r8), %rsi # tmp
+  movq %rsi, 4(%r9)
+
+  subq $SIZE_OF_SCORE_T, %r10
+  jmp 4b # next iteration
+5: # end loop
+
+  lea score(%r11), %r10 # &score[counter]
+
+  movq $0x00414141, (%r10) # .string "AAA"
+  movq %rdi, 4(%r10) # init score[counter]
+
+  movq %r10, new_highscore
+  movq %r10, new_highscore+8
+
+  movq $STATE_NEW_HIGHSCORE, game_state
+9: # return
+  movq %rbp, %rsp
+  popq %rbp
+
+  ret
+
 
 /**
  * writes data to the screen
