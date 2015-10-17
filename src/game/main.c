@@ -225,23 +225,23 @@ uint64_t rand_next() {
 //   game_state = STATE_HIGHSCORE;
 // }
 // 
-void menu_loop() {
-  uint64_t ascii = readKeyCode();
-
-  seed = (seed +1) % (1 << 31);
-
-  if(ascii) {
-    switch(ascii) {
-      case KEY_CODE_1:
-        game_init();
-        break;
-      case KEY_CODE_2:
-        highscore_init();
-        break;
-    };
-  }
-}
-
+// void menu_loop() {
+//   uint64_t ascii = readKeyCode();
+// 
+//   seed = (seed +1) % (1 << 31);
+// 
+//   if(ascii) {
+//     switch(ascii) {
+//       case KEY_CODE_1:
+//         game_init();
+//         break;
+//       case KEY_CODE_2:
+//         highscore_init();
+//         break;
+//     };
+//   }
+// }
+// 
 void new_highscore_loop() {
   uint64_t ascii = readKeyCode();
 

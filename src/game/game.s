@@ -51,6 +51,7 @@ along with gamelib-x64. If not, see <http://www.gnu.org/licenses/>.
 .global new_highscore_init
 .global highscore_init
 .global game_loop
+.global menu_loop
 .global new_highscore
 
 .global game_state
@@ -117,26 +118,18 @@ menu_loop:
   div %r11
   movq %rdx, seed
   
-#  subq $SIZE_OF_SCREEN_T, %rsp
-#  movq %rsp, %rdi # screen_t*
-#  movq $25, %rsi  # x
-#  movq $5, %rdx   # y
-#  movq $25, %rcx  # width
-#  movq $15, %r8   # height
-#  call screen_init
-
   call readKeyCode
   
   cmpq $KEY_CODE_1, %rax
   je 1f
 
-  cmpq $KEY_CODE_1, %rax
+  cmpq $KEY_CODE_2, %rax
   je 2f
 
-  jmp 9f
+  jmp 9f # no hit
 1: # KEY_CODE_1
-  pushq 9f
-  jmp game_init
+  call game_init
+  jmp 9f
 2: # KEY_CODE_2
   call highscore_init
 
