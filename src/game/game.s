@@ -70,18 +70,18 @@ gameInit:
   pushq %rbp
   movq %rsp, %rbp
 
-  movq $19886, %rdi
+  movq $19886, %rdi # 60Hz
   call setTimer
 
   movq $scr_full, %rdi
-  movq $0, %rsi
-  movq $0, %rdx
-  movq $SCREEN_SIZE_X, %rcx
-  movq $SCREEN_SIZE_Y, %r8
+  movq $0, %rsi # x
+  movq $0, %rdx # y
+  movq $SCREEN_SIZE_X, %rcx # width
+  movq $SCREEN_SIZE_Y, %r8 # height
   call screen_init
 
-  movq $0, %rdi
-  movq $0, %rsi
+  movq $0, %rdi # default screen
+  movq $0, %rsi # color black
   call screen_clear
 
   call menu_init

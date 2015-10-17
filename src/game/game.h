@@ -11,11 +11,10 @@
 
 #define BLOCK_QUEUE_SIZE 4
 
-#define STATE_SUSPEND       0
-#define STATE_MENU          1
-#define STATE_GAME          2
-#define STATE_HIGHSCORE     3
-#define STATE_NEW_HIGHSCORE 4
+#define STATE_MENU          0
+#define STATE_GAME          1
+#define STATE_HIGHSCORE     2
+#define STATE_NEW_HIGHSCORE 3
 
 #define SCORE_SIZE 10
 typedef struct {
