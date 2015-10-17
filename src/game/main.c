@@ -242,40 +242,40 @@ uint64_t rand_next() {
 //   }
 // }
 // 
-void new_highscore_loop() {
-  uint64_t ascii = readKeyCode();
-
-  screen_t scr_score;
-  screen_init(&scr_score, 20, 10, 45, 2);
-
-//  screen_clear(&scr_score, 0x00);
-  if(ascii) {
-    switch(ascii) {
-      case KEY_CODE_AU:
-        ++*new_highscore.name_p;
-        break;
-      case KEY_CODE_AD:
-        --*new_highscore.name_p;
-        break;
-      case KEY_CODE_ENT:
-        ++new_highscore.name_p;
-
-        // Name entered
-        if(!*new_highscore.name_p) {
-          highscore_init();
-          return;
-        }
-        break;
-    }
-  }
-
-  writef(&scr_score,
-      "Your score: %c%u%c%n"
-      "Your name:  %c%s",
-      0x2F, new_highscore.score->score, 0x07, 0xC7, new_highscore.score->name
-  );
-}
-
+// void new_highscore_loop() {
+//   uint64_t ascii = readKeyCode();
+// 
+//   screen_t scr_score;
+//   screen_init(&scr_score, 20, 10, 45, 2);
+// 
+// //  screen_clear(&scr_score, 0x00);
+//   if(ascii) {
+//     switch(ascii) {
+//       case KEY_CODE_AU:
+//         ++*new_highscore.name_p;
+//         break;
+//       case KEY_CODE_AD:
+//         --*new_highscore.name_p;
+//         break;
+//       case KEY_CODE_ENT:
+//         ++new_highscore.name_p;
+// 
+//         // Name entered
+//         if(!*new_highscore.name_p) {
+//           highscore_init();
+//           return;
+//         }
+//         break;
+//     }
+//   }
+// 
+//   writef(&scr_score,
+//       "Your score: %c%u%c%n"
+//       "Your name:  %c%s",
+//       0x2F, new_highscore.score->score, 0x07, 0xC7, new_highscore.score->name
+//   );
+// }
+// 
 void highscore_loop() {
   uint64_t ascii = readKeyCode();
 

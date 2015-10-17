@@ -53,7 +53,7 @@ along with gamelib-x64. If not, see <http://www.gnu.org/licenses/>.
 .global game_loop
 .global menu_loop
 .global new_highscore
-
+.global new_highscore_loop
 .global game_state
 
 .global panic
@@ -105,6 +105,80 @@ gameLoop:
   jmp c_loop
 
 
+# Record the name and score of the player
+new_highscore_loop:
+  pushq %rbp
+  movq %rsp, %rbp
+
+  subq $SIZE_OF_SCREEN_T, %rsp
+  movq %rsp, %rdi  # screen_t*
+  movq $20, %rsi   # x
+  movq $10, %rdx   # y
+  movq $45, %rcx   # width
+  movq $2, %r8     # height
+  call screen_init
+
+  call readKeyCode
+  
+  cmpq $KEY_CODE_AU, %rax
+  je 1f
+
+  cmpq $KEY_CODE_AD, %rax
+  je 2f
+
+  cmpq $KEY_CODE_ENT, %rax
+  je 3f
+
+  jmp 4f
+1: # KEY_CODE_AU
+  # increment *new_highscore.name_p
+  movq new_highscore, %r11
+  incq (%r11)
+  jmp 4f
+2: # KEY_CODE_AD
+  # decrement *new_highscore.name_p
+  movq new_highscore, %r11
+  decq (%r11)
+  jmp 4f
+3: # KEY_CODE_ENT
+  # increment new_highscore.name
+  movq new_highscore, %r11
+  incq %r11
+
+  # if new_highscore.name_p points to a null-byte
+  cmpb $0, (%r11)
+  movq %r11, new_highscore
+
+  jne 4f
+
+  call highscore_init
+  jmp 9f
+4: # end switch
+.data
+new_highscore_f:
+  .ascii  "Your score: %c%u%c%n"
+  .string "Your name:  %c%s"
+.text
+  # new_highscore.score
+  movq new_highscore+8, %r11  
+
+  movq %rsp, %rdi # screen_t*
+  movq $new_highscore_f, %rsi # string format
+  movq $0x2F, %rdx
+  movq 4(%r11), %rcx # score->score
+  movq $0x07, %r8
+  movq $0xC7, %r9
+  pushq %r11 # score->name
+  call writef
+
+9: # return
+  movq %rbp, %rsp
+  popq %rbp
+
+  ret
+
+
+# Tge player can choose between the game and the highscore
 menu_loop:
   pushq %rbp
   movq %rsp, %rbp 
