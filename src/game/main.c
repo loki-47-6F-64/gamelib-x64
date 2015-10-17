@@ -201,26 +201,26 @@ void c_menu_init() {
 
   game_state = STATE_MENU;
 }
-
-void highscore_init() {
-  screen_clear(NULL, 0x00);
-
-  screen_t scr_score;
-  screen_init(&scr_score, 20, 5, 45, SCORE_SIZE + 2);
-
-  writef(&scr_score, "-- Hall of Shame --%n%n");
-  for(int x = 0; x < SCORE_SIZE; ++x) {
-    // Printed all scores
-    if(!score[x].score) {
-      break;
-    }
-
-    writef(&scr_score, "%s | %u%n", score[x].name, score[x].score);
-  }
-
-  game_state = STATE_HIGHSCORE;
-}
-
+// 
+// void highscore_init() {
+//   screen_clear(NULL, 0x00);
+// 
+//   screen_t scr_score;
+//   screen_init(&scr_score, 20, 5, 45, SCORE_SIZE + 2);
+// 
+//   writef(&scr_score, "-- Hall of Shame --%n%n");
+//   for(int x = 0; x < SCORE_SIZE; ++x) {
+//     // Printed all scores
+//     if(!score[x].score) {
+//       break;
+//     }
+// 
+//     writef(&scr_score, "%s | %u%n", score[x].name, score[x].score);
+//   }
+// 
+//   game_state = STATE_HIGHSCORE;
+// }
+// 
 void c_menu_loop() {
   uint64_t ascii = readKeyCode();
 

@@ -47,6 +47,7 @@ along with gamelib-x64. If not, see <http://www.gnu.org/licenses/>.
 .global game_next
 .global game_draw
 .global new_highscore_init
+.global highscore_init
 
 .global panic
 
@@ -76,6 +77,61 @@ gameInit:
 
 gameLoop:
   jmp c_loop
+
+# initialize highscore mode
+highscore_init:
+  pushq %rbp
+  movq %rsp, %rbp
+
+  subq $SIZE_OF_SCREEN_T, %rsp
+  pushq %r15
+
+  movq $0, %rdi    # default screen_t*
+  movq $0x00, %rsi # color
+  call screen_clear
+
+  lea -SIZE_OF_SCREEN_T(%rbp), %rdi # screen_t*
+
+  movq $20, %rsi          # x
+  movq $5, %rdx           # y
+  movq $45, %rcx          # width
+  movq $SCORE_SIZE+2, %r8 # height
+  call screen_init
+
+.data
+hall_of_shame: .string "-- Hall of Shame --%n%n"
+score_f: .string "%s | %u%n"
+.text
+  lea -SIZE_OF_SCREEN_T(%rbp), %rdi # screen_t*
+  movq $hall_of_shame, %rsi
+  call writef
+
+  movq $0, %r15 # init counter
+1: # while counter < SCORE_SIZE
+  lea score(%r15), %rdx # score_t*
+
+  movq 4(%rdx), %rcx
+
+  cmpq $0, %rcx
+  je 2f # break if score == 0
+  
+  lea -SIZE_OF_SCREEN_T(%rbp), %rdi # screen_t*
+  movq $score_f, %rsi
+  call writef
+
+  addq $SIZE_OF_SCORE_T, %r15
+  cmpq $SIZE_OF_SCORE_T*SCORE_SIZE, %r15
+  jl 1b
+2: # end loop
+  movq $STATE_HIGHSCORE, game_state
+
+  popq %r15
+
+  movq %rbp, %rsp
+  popq %rbp
+
+  ret
+
 
 /**
  * If it fits in the highscore, prepare the new highscore
