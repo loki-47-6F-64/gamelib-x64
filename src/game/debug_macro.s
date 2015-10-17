@@ -26,6 +26,9 @@
 .set SCREEN_SIZE_X, 80
 .set SCREEN_SIZE_Y, 25
 
+.set FIELD_SIZE_X, 12
+.set FIELD_SIZE_Y, 12
+
 .set BLOCK_QUEUE_SIZE, 4
 .set SCORE_SIZE, 10
 

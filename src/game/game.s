@@ -46,6 +46,7 @@ along with gamelib-x64. If not, see <http://www.gnu.org/licenses/>.
 .global game_block_reset
 .global game_next
 .global game_draw
+.global game_init
 .global new_highscore_init
 .global highscore_init
 
@@ -77,6 +78,67 @@ gameInit:
 
 gameLoop:
   jmp c_loop
+
+# initialize the game
+game_init:
+  pushq %rbp
+  movq %rsp, %rbp
+  
+  pushq %r15
+
+  movq $game, %rdi
+  movq $0, %rsi
+  movq $SIZE_OF_GAME_T, %rdx
+  call fill # fill(&game, 0, sizeof(game_t)
+
+  movq $game+8, game # game.player = &game.queue[0]
+  
+  .set GAME_FIELD, SIZE_OF_BLOCK_T*BLOCK_QUEUE_SIZE+8
+
+  # &game.field
+  movq $GAME_FIELD+game, %rdi
+  movq $10, %rsi
+  movq $6, %rdx
+  call field_init
+
+# init the screen of the field
+  movq $GAME_FIELD+SIZE_OF_FIELD_T+game, %rdi
+
+  # game.field.screen.first.x
+  movq $0, %rsi
+  movl GAME_FIELD+game, %esi
+  lea FIELD_SIZE_X+2(%rsi), %rsi # FIELD_SIZE_X + x + 2
+
+  movq $4, %rdx
+  movq $5, %rcx
+  movq $BLOCK_POINTS*4+1, %r8
+  call screen_init # finally
+
+  movq $game, %rdi
+  call game_block_reset
+
+  movq $0, %r15 # init counter
+
+1: # while counter < BLOCK_POINTS
+
+  lea game+8(%r15), %rdi
+  call block_next
+
+  addq $SIZE_OF_BLOCK_T, %r15
+  cmpq $SIZE_OF_BLOCK_T*BLOCK_POINTS, %r15
+  jl 1b # next iteration if counter < BLOCK_POINTS
+# end loop
+
+  movq $6*TICKS_PER_SEC, SIZE_OF_GAME_T-16+game
+  movq $STATE_GAME, game_state
+
+  popq %r15
+
+  movq %rbp, %rsp
+  popq %rbp
+
+  ret
+
 
 # initialize highscore mode
 highscore_init:

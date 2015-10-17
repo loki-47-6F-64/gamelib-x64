@@ -84,33 +84,33 @@ void new_highscore_init(uint64_t new_score);
 //   game_state = STATE_NEW_HIGHSCORE;
 // }
 // 
-/**
- * initialize the game
- */
-void game_init() {
-  fill(&game, 0, sizeof(game_t));
-
-  game.player = game.queue;
-
-  field_init(&game.field, 10, 6);
-  screen_init(&game.block_screen,
-      FIELD_SIZE_X + game.field.screen.first.x  +2,
-      4,
-      5,
-      BLOCK_POINTS *4 +1
-  );
-
-  game_block_reset(&game);
-
-  for(int x = 0; x < BLOCK_POINTS; ++x) {
-    block_next(&game.queue[x]);
-  }
-
-  game.timer = 6 *TICKS_PER_SEC;
-
-  game_state = STATE_GAME;
-}
-
+// /**
+//  * initialize the game
+//  */
+// void game_init() {
+//   fill(&game, 0, sizeof(game_t));
+// 
+//   game.player = game.queue;
+// 
+//   field_init(&game.field, 10, 6);
+//   screen_init(&game.block_screen,
+//       FIELD_SIZE_X + game.field.screen.first.x  +2,
+//       4,
+//       5,
+//       BLOCK_POINTS *4 +1
+//   );
+// 
+//   game_block_reset(&game);
+// 
+//   for(int x = 0; x < BLOCK_POINTS; ++x) {
+//     block_next(&game.queue[x]);
+//   }
+// 
+//   game.timer = 6 *TICKS_PER_SEC;
+// 
+//   game_state = STATE_GAME;
+// }
+// 
 uint64_t seed = 973;
 uint64_t rand_next() {
   // wiki https://en.wikipedia.org/wiki/Linear_congruential_generator
