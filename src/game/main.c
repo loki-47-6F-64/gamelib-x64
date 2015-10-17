@@ -23,6 +23,7 @@ void menu_init();
  */
 void new_highscore_init(uint64_t new_score);
 
+void highscore_loop();
 void menu_loop();
 void new_highscore_loop();
 void game_loop();
@@ -276,14 +277,14 @@ uint64_t rand_next() {
 //   );
 // }
 // 
-void highscore_loop() {
-  uint64_t ascii = readKeyCode();
-
-  if(ascii == KEY_CODE_ENT) {
-    menu_init();
-  }
-}
-
+// void highscore_loop() {
+//   uint64_t ascii = readKeyCode();
+// 
+//   if(ascii == KEY_CODE_ENT) {
+//     menu_init();
+//   }
+// }
+// 
 void c_loop() {
   switch(game_state) {
     case STATE_MENU:

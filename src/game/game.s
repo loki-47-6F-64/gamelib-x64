@@ -55,7 +55,7 @@ along with gamelib-x64. If not, see <http://www.gnu.org/licenses/>.
 .global new_highscore
 .global new_highscore_loop
 .global game_state
-
+.global highscore_loop
 .global panic
 
 .section .data
@@ -105,6 +105,22 @@ gameLoop:
   jmp c_loop
 
 
+highscore_loop:
+  pushq %rbp
+  movq %rsp, %rbp
+
+  call readKeyCode
+  
+  cmpq $KEY_CODE_ENT, %rax
+  jne 1f # return if not key enter
+
+  call menu_init
+1: # return
+  movq %rbp, %rsp
+  popq %rbp
+
+  ret
+ 
 # Record the name and score of the player
 new_highscore_loop:
   pushq %rbp
