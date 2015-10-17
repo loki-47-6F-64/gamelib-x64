@@ -130,7 +130,7 @@ void game_loop();
 // 
 //   seed = (a*seed + c) % m;
 // 
-//   return seed;
+//   return seed / 3;
 // }
 // 
 // void game_loop() {
