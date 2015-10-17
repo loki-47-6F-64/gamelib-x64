@@ -8,11 +8,11 @@
  * porting it to assembly. :p
  */
 
-new_highscore_t new_highscore;
-score_t score[SCORE_SIZE];
-game_t game;
-
-uint64_t game_state;
+// new_highscore_t new_highscore;
+// score_t score[SCORE_SIZE];
+// game_t game;
+// 
+// uint64_t game_state;
 
 void highscore_init();
 void menu_init();
@@ -22,6 +22,10 @@ void menu_init();
  *  score -- the new highscore
  */
 void new_highscore_init(uint64_t new_score);
+
+void menu_loop();
+void new_highscore_loop();
+void game_loop();
 
 // /**
 //  * writes data to the screen
@@ -127,62 +131,62 @@ uint64_t rand_next() {
 
   return seed;
 }
-
-void c_game_loop() {
-  int64_t ascii = readKeyCode();
-
-  screen_t scr_info;
-  screen_init(&scr_info, 0, 0, SCREEN_SIZE_X, 2);
-
-  --game.timer;
-  if(ascii) {
-    screen_clear(NULL, 0x00);
-
-    switch(ascii) {
-      case KEY_CODE_AU:
-        block_mov(game.player, 0, -1);
-        break;
-      case KEY_CODE_AD:
-        block_mov(game.player, 0, 1);
-        break;
-      case KEY_CODE_AL:
-        block_mov(game.player, -1, 0);
-        break;
-      case KEY_CODE_AR:
-        block_mov(game.player, 1, 0);
-        break;
-      case KEY_CODE_S:
-        block_rotate(game.player);
-        break;
-      case KEY_CODE_ENT:
-        if( game.player->dealloc ||
-            field_empty(&game.field, game.player)
-        ) {
-          ++game.score;
-          field_block_merge(&game.field, game.player);
-
-          game_next(&game); 
-        }
-        break;
-    }
-
-    game_draw(&game);
-  }
-
-  if(game.timer == 0) {
-//    screen_clear(NULL, 0x00);
-//    writef(NULL, "The application crashed...%nWhy did you abandon it? You monster!");
-
-    new_highscore_init(game.score);
-
-    return;
-  }
-
-  writef(&scr_info,
-      "Time left: %c%u%c seconds!%n"
-      "Your current score: %c%u",
-      0xCF, game.timer / TICKS_PER_SEC +1, 0x07, 0x2F, game.score);
-}
+// 
+// void game_loop() {
+//   int64_t ascii = readKeyCode();
+// 
+//   screen_t scr_info;
+//   screen_init(&scr_info, 0, 0, SCREEN_SIZE_X, 2);
+// 
+//   --game.timer;
+//   if(ascii) {
+//     screen_clear(NULL, 0x00);
+// 
+//     switch(ascii) {
+//       case KEY_CODE_AU:
+//         block_mov(game.player, 0, -1);
+//         break;
+//       case KEY_CODE_AD:
+//         block_mov(game.player, 0, 1);
+//         break;
+//       case KEY_CODE_AL:
+//         block_mov(game.player, -1, 0);
+//         break;
+//       case KEY_CODE_AR:
+//         block_mov(game.player, 1, 0);
+//         break;
+//       case KEY_CODE_S:
+//         block_rotate(game.player);
+//         break;
+//       case KEY_CODE_ENT:
+//         if( game.player->dealloc ||
+//             field_empty(&game.field, game.player)
+//         ) {
+//           ++game.score;
+//           field_block_merge(&game.field, game.player);
+// 
+//           game_next(&game); 
+//         }
+//         break;
+//     }
+// 
+//     game_draw(&game);
+//   }
+// 
+//   if(game.timer == 0) {
+// //    screen_clear(NULL, 0x00);
+// //    writef(NULL, "The application crashed...%nWhy did you abandon it? You monster!");
+// 
+//     new_highscore_init(game.score);
+// 
+//     return;
+//   }
+// 
+//   writef(&scr_info,
+//       "Time left: %c%u%c seconds!%n"
+//       "Your current score: %c%u",
+//       0xCF, game.timer / TICKS_PER_SEC +1, 0x07, 0x2F, game.score);
+// }
 // 
 // void menu_init() {
 //   screen_t middle;
@@ -221,7 +225,7 @@ void c_game_loop() {
 //   game_state = STATE_HIGHSCORE;
 // }
 // 
-void c_menu_loop() {
+void menu_loop() {
   uint64_t ascii = readKeyCode();
 
   seed = (seed +1) % (1 << 31);
@@ -240,7 +244,7 @@ void c_menu_loop() {
   }
 }
 
-void c_new_highscore_loop() {
+void new_highscore_loop() {
   uint64_t ascii = readKeyCode();
 
   screen_t scr_score;
@@ -285,16 +289,16 @@ void highscore_loop() {
 void c_loop() {
   switch(game_state) {
     case STATE_MENU:
-      c_menu_loop();
+      menu_loop();
       break;
     case STATE_GAME:
-      c_game_loop();
+      game_loop();
       break;
     case STATE_HIGHSCORE:
       highscore_loop();
       break;
     case STATE_NEW_HIGHSCORE:
-      c_new_highscore_loop();
+      new_highscore_loop();
       break;
   }
 }

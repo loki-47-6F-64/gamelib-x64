@@ -50,10 +50,19 @@ along with gamelib-x64. If not, see <http://www.gnu.org/licenses/>.
 .global menu_init
 .global new_highscore_init
 .global highscore_init
+.global game_loop
+.global new_highscore
+
+.global game_state
 
 .global panic
 
 .section .data
+
+new_highscore: .skip 16
+score: .skip SIZE_OF_SCORE_T*SCORE_SIZE
+game: .skip SIZE_OF_GAME_T
+game_state: .skip 8
 
 .section .text
 
@@ -93,6 +102,153 @@ gameInit:
 
 gameLoop:
   jmp c_loop
+
+game_loop:
+  pushq %rbp
+  movq %rsp, %rbp
+
+  # init screen for info
+  subq $SIZE_OF_SCREEN_T, %rsp
+  movq %rsp, %rdi
+  movq $0, %rsi
+  movq $0, %rdx
+  movq $SCREEN_SIZE_X, %rcx
+  movq $2, %r8
+  call screen_init
+
+  call readKeyCode
+
+  # --game.timer
+  decq game+SIZE_OF_GAME_T-16
+
+  cmpq $0, %rax
+  je 8f # skip switch if no key found
+
+  pushq %rax # save keycode temporarely
+  movq $0, %rdi # default screen
+  movq $0, %rsi # color black
+  call screen_clear
+  popq %rax
+
+  cmpq $KEY_CODE_AU, %rax
+  je 1f
+
+  cmpq $KEY_CODE_AD, %rax
+  je 2f
+
+  cmpq $KEY_CODE_AL, %rax
+  je 3f
+
+  cmpq $KEY_CODE_AR, %rax
+  je 4f
+
+  cmpq $KEY_CODE_S, %rax
+  je 5f
+
+  cmpq $KEY_CODE_ENT, %rax
+  je 6f
+
+  jmp 7f
+1: # KEY_CODE_AU
+  movq game, %rdi # game.player
+  movq $0, %rsi
+  movq $-1, %rdx
+  call block_mov
+
+  jmp 7f
+2: # KEY_CODE_AD
+  movq game, %rdi # game.player
+  movq $0, %rsi
+  movq $1, %rdx
+  call block_mov
+
+  jmp 7f
+3: # KEY_CODE_AL
+  movq game, %rdi # game.player
+  movq $-1, %rsi
+  movq $0, %rdx
+  call block_mov
+
+  jmp 7f
+4: # KEY_CODE_AR
+  movq game, %rdi # game.player
+  movq $1, %rsi
+  movq $0, %rdx
+  call block_mov
+
+  jmp 7f
+5: # KEY_CODE_S
+  movq game, %rdi # game.player
+  call block_rotate
+
+  jmp 7f
+6: # KEY_CODE_ENT
+
+  # When the player is a deallocation block, the field doesn't need to be empty
+  movq game, %r11 # game.player
+  cmpl $0, SIZE_OF_BLOCK_T-4(%r11)
+  jne 11f # skip next compare
+
+  # make sure field is empty before proceding
+  movq $GAME_FIELD+game, %rdi
+  movq %r11, %rsi
+  call field_empty
+
+  cmpq $0, %rax
+  je 7f
+11:
+  # ++game.score
+  incq game+SIZE_OF_GAME_T-8
+
+  movq $GAME_FIELD+game, %rdi
+  movq game, %rsi # game.player
+  call field_block_merge
+
+  movq $game, %rdi
+  call game_next
+7: # end switch
+
+  movq $game, %rdi
+  call game_draw
+8: # skip switch
+
+  # if timer == 0, goto new highscore screen
+  cmpq $0, SIZE_OF_GAME_T-16+game
+  jne 9f
+
+  # game.score
+  movq game+SIZE_OF_GAME_T-8, %rdi
+  call new_highscore_init
+
+  jmp 10f # return
+9: # endif
+.data
+game_loop_f:
+  .ascii  "time left: %c%u%c seconds!%n"
+  .string "your current score: %c%u"
+.text
+
+  # game.timer / TICKS_PER_SEC +1
+  movq $0, %rdx
+  movq game+SIZE_OF_GAME_T-16, %rax
+  movq $TICKS_PER_SEC, %r11
+  div %r11
+  inc %rax
+
+  movq %rsp, %rdi # info screen
+  movq $game_loop_f, %rsi # format string
+  movq $0xCF, %rdx # color
+  movq %rax, %rcx # game.timer / TICKS_PER_SEC +1
+  movq $0x07, %r8 # color
+  movq $0x2F, %r9 # color
+  pushq game+SIZE_OF_GAME_T-8 # game.score
+  call writef
+
+10: # return
+  movq %rbp, %rsp
+  popq %rbp
+
+  ret
 
 # initialize the menu
 menu_init:
