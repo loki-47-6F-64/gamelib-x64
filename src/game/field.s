@@ -21,6 +21,127 @@
 
 .global field_init
 .global field_empty
+.global field_draw
+
+/**
+ * Draw field on screen
+ * params:
+ *  (field_t*) field
+ */
+field_draw:
+  pushq %rbp
+  movq %rsp, %rbp
+
+  assert $0, %rdi, field_draw_1, jne
+
+  pushq %r15
+  pushq %r14
+  pushq %r13
+  pushq %r12
+  pushq %rbx
+
+  movq %rdi, %r15
+  movl (%rdi), %r14d  # screen.first.x
+  movl 4(%rdi), %r13d # screen.first.y
+  movl 8(%rdi), %r12d # screen.last.x
+  movl 12(%rdi), %ebx # screen.last.y
+
+  decq %r14 # first.x -1
+  decq %r13 # first.y -1
+1: # while counter > last.x
+  cmpq %r12, %r14
+  jg 2f
+
+  # upper border
+  movq %r14, %rdi # x
+  movq %r13, %rsi # first.y
+  movq $'+', %rdx
+  movq $0x7F, %rcx
+  call putChar
+
+  # lower border
+  movq %r14, %rdi # x
+  movq %rbx, %rsi # last.y
+  movq $'+', %rdx
+  movq $0x7F, %rcx
+  call putChar
+
+  incq %r14
+  jmp 1b
+
+2: # end loop
+  # restore first.x 
+  movl (%r15), %r14d  # screen.first.x 
+  decq %r14 # first.x -1
+
+3: # while counter > last.y
+  cmpq %rbx, %r13
+  jg 4f
+
+  # left border
+  movq %r14, %rdi # first.x
+  movq %r13, %rsi # y
+  movq $'+', %rdx
+  movq $0x7F, %rcx
+  call putChar
+
+  # right border
+  movq %r12, %rdi # last.x
+  movq %r13, %rsi # y
+  movq $'+', %rdx
+  movq $0x7F, %rcx
+  call putChar
+ 
+  incq %r13
+  jmp 3b
+4: # end loop
+  # restore screen.first.y
+  movl 4(%r15), %r13d # screen.first.y
+  incq %r14 # screen.first.x
+
+  # last.x and last.y no longer has any use
+  movq $0, %r12 # y
+5: # while counter_y < FIELD_SIZE_Y
+  cmpq $FIELD_SIZE_Y, %r12
+  jnl 8f
+
+  movq $0, %rbx # init counter_x
+6: # inner while counter_x < FIELD_SIZE_X
+  cmpq $FIELD_SIZE_X, %rbx
+  jnl 7f
+
+  movq $FIELD_SIZE_X, %rax
+  mul %r12
+
+  lea (%rax, %rbx), %r11
+  cmpl $0, SIZE_OF_SCREEN_T(%r15, %r11, 4)
+  je 10f # skip putChar
+
+  # get actual coordinates on screen
+  lea (%r14, %rbx), %rdi # field->screen.first.x + x
+  lea (%r13, %r12), %rsi # field->screen.first.y + y
+  movq $'#', %rdx
+  movq $0x07, %rcx
+  call putChar
+  
+10: # skip putChar
+  incq %rbx
+  jmp 6b
+7: # end inner loop
+  incq %r12
+  jmp 5b
+8: # end loop
+  popq %rbx
+  popq %r12
+  popq %r13
+  popq %r14
+  popq %r15
+
+  movq %rbp, %rsp
+  popq %rbp
+
+  ret
+
 
 /**
  * Checks wether it is possible to place the block

@@ -30,53 +30,53 @@
 //  * returns:
 //  *    0 on false
 //  */
-int _field_empty(field_t *field, block_t *block) {
-  assert(field && block);
-
-  point_t block_point[BLOCK_POINTS];
-  block_to_points(&field->screen, block_point, block);
-
-  for(int x = 0; x < BLOCK_POINTS; ++x) {
-    point_t *tmp = &block_point[x];
-    // if field occupied
-    if(field->field[tmp->y][tmp->x]) {
-      return 0;
-    }
-  }
-
-  return 1;
-}
+// int field_empty(field_t *field, block_t *block) {
+//   assert(field && block);
 // 
-/**
- * Draw field on screen
- * params:
- *  field
- */
-void field_draw(field_t *field) {
-  assert(field);
-
-  point_t bound_l = { field->screen.first.x -1, field->screen.first.y -1 };
-  point_t bound_r = { field->screen.last.x, field->screen.last.y };
-
-  for(int x = bound_l.x; x <= bound_r.x; ++x) {
-    putChar(x, bound_l.y, '+', 0x7F);
-    putChar(x, bound_r.y, '+', 0x7F);
-  }
-
-  for(int y = bound_l.y; y <= bound_r.y; ++y) {
-    putChar(bound_l.x, y, '+', 0x7F);
-    putChar(bound_r.x, y, '+', 0x7F);
-  }
-
-  for(int y = 0; y < FIELD_SIZE_Y; ++y) {
-    for(int x = 0; x < FIELD_SIZE_X; ++x) {
-      // draw blocks
-      if(field->field[y][x]) {
-        putChar(field->screen.first.x + x, field->screen.first.y + y, '#', 0x07);
-      }
-    }
-  }
-}
+//   point_t block_point[BLOCK_POINTS];
+//   block_to_points(&field->screen, block_point, block);
+// 
+//   for(int x = 0; x < BLOCK_POINTS; ++x) {
+//     point_t *tmp = &block_point[x];
+//     // if field occupied
+//     if(field->field[tmp->y][tmp->x]) {
+//       return 0;
+//     }
+//   }
+// 
+//   return 1;
+// }
+// 
+// /**
+//  * Draw field on screen
+//  * params:
+//  *  field
+//  */
+// void field_draw(field_t *field) {
+//   assert(field);
+// 
+//   point_t bound_l = { field->screen.first.x -1, field->screen.first.y -1 };
+//   point_t bound_r = { field->screen.last.x, field->screen.last.y };
+// 
+//   for(int x = bound_l.x; x <= bound_r.x; ++x) {
+//     putChar(x, bound_l.y, '+', 0x7F);
+//     putChar(x, bound_r.y, '+', 0x7F);
+//   }
+// 
+//   for(int y = bound_l.y; y <= bound_r.y; ++y) {
+//     putChar(bound_l.x, y, '+', 0x7F);
+//     putChar(bound_r.x, y, '+', 0x7F);
+//   }
+// 
+//   for(int y = 0; y < FIELD_SIZE_Y; ++y) {
+//     for(int x = 0; x < FIELD_SIZE_X; ++x) {
+//       // draw blocks
+//       if(field->field[y][x]) {
+//         putChar(field->screen.first.x + x, field->screen.first.y + y, '#', 0x07);
+//       }
+//     }
+//   }
+// }
 
 /**
  * params:
