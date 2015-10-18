@@ -427,7 +427,6 @@ game_init:
   
   pushq %r15
 
-  assert $0, %rdi, shit!!, je
   movq $game, %rdi
   movq $0, %rsi
   movq $SIZE_OF_GAME_T, %rdx

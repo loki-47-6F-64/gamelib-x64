@@ -2,35 +2,35 @@
 #include "src/game/game.h"
 #include "src/game/util.h"
 
-/**
- * initializes a field.
- * params:
- *  field -- the field to init
- *  x -- x-origin
- *  y -- y-origin
- *  wdith
- *  height
- */
-void field_init(field_t *field, int32_t x, int32_t y) {
-  assert(field)
-
-  assert(x >= 0 && y >= 0)
-  assert((x + FIELD_SIZE_X <= SCREEN_SIZE_X) && (y + FIELD_SIZE_Y <= SCREEN_SIZE_Y))
-
-
-  screen_init(&field->screen, x +1, y +1, FIELD_SIZE_X -1, FIELD_SIZE_Y -1);
-  fill(field->field, 0, sizeof(field->field));
-}
-
-/**
- * Checks wether it is possible to place the block
- * params
- *  field -- the playing field
- *  block -- the block that might overlap some other blocks or exceed bounds
- * returns:
- *    0 on false
- */
-int field_empty(field_t *field, block_t *block) {
+// /**
+//  * initializes a field.
+//  * params:
+//  *  field -- the field to init
+//  *  x -- x-origin
+//  *  y -- y-origin
+//  *  wdith
+//  *  height
+//  */
+// void field_init(field_t *field, int32_t x, int32_t y) {
+//   assert(field)
+// 
+//   assert(x >= 0 && y >= 0)
+//   assert((x + FIELD_SIZE_X <= SCREEN_SIZE_X) && (y + FIELD_SIZE_Y <= SCREEN_SIZE_Y))
+// 
+// 
+//   screen_init(&field->screen, x +1, y +1, FIELD_SIZE_X -1, FIELD_SIZE_Y -1);
+//   fill(field->field, 0, sizeof(field->field));
+// }
+// 
+// /**
+//  * Checks wether it is possible to place the block
+//  * params
+//  *  field -- the playing field
+//  *  block -- the block that might overlap some other blocks or exceed bounds
+//  * returns:
+//  *    0 on false
+//  */
+int _field_empty(field_t *field, block_t *block) {
   assert(field && block);
 
   point_t block_point[BLOCK_POINTS];
@@ -46,7 +46,7 @@ int field_empty(field_t *field, block_t *block) {
 
   return 1;
 }
-
+// 
 /**
  * Draw field on screen
  * params:
