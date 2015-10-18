@@ -43,20 +43,6 @@ along with gamelib-x64. If not, see <http://www.gnu.org/licenses/>.
 .global gameLoop
 .global write
 .global wait_for_debugger
-.global game_block_reset
-.global game_next
-.global game_draw
-.global game_init
-.global menu_init
-.global new_highscore_init
-.global highscore_init
-.global game_loop
-.global menu_loop
-.global new_highscore
-.global new_highscore_loop
-.global game_state
-.global highscore_loop
-.global panic
 
 .section .data
 
@@ -441,6 +427,7 @@ game_init:
   
   pushq %r15
 
+  assert $0, %rdi, shit!!, je
   movq $game, %rdi
   movq $0, %rsi
   movq $SIZE_OF_GAME_T, %rdx
@@ -827,36 +814,3 @@ game_block_reset:
   popq %rbp
 
   ret
-
-/*
-  Something unrecoverable happened
-  We must print as much as possible on the screen before halting
-*/
-panic:
-  pushq %r15
-  pushq %r14
-  pushq %r13
-  pushq %r12
-  pushq %r11
-  pushq %r10
-  pushq %r9
-  pushq %r8
-
-  # push rsp with original value
-  movq %rsp, %r15
-  addq $64, %r15
-  pushq %r15
-
-  pushq %rbp
-  pushq %rdi
-  pushq %rsi
-  pushq %rdx
-  pushq %rcx
-  pushq %rbx
-  pushq %rax
-
-  movq %rsp, %rdi
-  call print_snapshot
-panic_hlt:
-  hlt
-  jmp panic_hlt
