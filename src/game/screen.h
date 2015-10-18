@@ -23,7 +23,7 @@ typedef struct {
   point_t cursor;
 } screen_t;
 
-screen_t scr_full;
+// screen_t scr_full;
 
 /**
  * Makes the entire screen black

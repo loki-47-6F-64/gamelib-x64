@@ -17,6 +17,8 @@
 
 .include "src/game/debug_macro.s"
 
+.data
+scr_full: .skip SIZE_OF_SCREEN_T
 .text
 
 .global normalize
