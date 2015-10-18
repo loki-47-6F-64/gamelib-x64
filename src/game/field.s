@@ -22,6 +22,85 @@
 .global field_init
 .global field_empty
 .global field_draw
+.global field_block_draw
+
+/**
+ * params:
+ *  (field_t*) field -- the field
+ *  (block_t*) block -- the block to draw
+ */
+field_block_draw:
+  pushq %rbp
+  movq %rsp, %rbp
+
+  assert $0, %rdi, field_empty_1, jne
+  assert $0, %rsi, field_empty_2, jne
+
+  # init block_points
+  subq $8*BLOCK_POINTS, %rsp
+
+  pushq %r15
+  pushq %r14
+ 
+  movq %rdi, %r15 # field
+  movq %rsi, %r14 # block
+
+  # rdi is already at the correct value: &field->screen
+  lea -8*BLOCK_POINTS(%rbp), %rsi
+  movq %r14, %rdx
+  call block_to_points
+
+  movq $0, %r11 # init counter
+1: # while counter < BLOCK_POINTS
+  lea -8*BLOCK_POINTS(%rbp, %r11, 8), %r10 # &block_point[counter]
+
+  movq $0, %r8
+  movq $0, %r9
+
+  movl (%r10), %r9d  # x
+  movl 4(%r10), %r8d # y
+
+  movq $0, %rdx
+  movq $FIELD_SIZE_X, %rax
+  mul %r8
+  addq %r9, %rax # rax = x + y*FIELD_SIZE_X
+
+  # field->field
+  cmpl $0, SIZE_OF_SCREEN_T(%r15, %rax, 4)
+  movq $0x27, %rcx
+  je 2f # if field empty
+
+  movq $0xC7, %rcx
+2: # skip modifying color
+
+  cmpq $0, SIZE_OF_BLOCK_T-8(%r14) # block->dealloc
+  movq $'#', %rdx
+  je 3f # if deallocation block
+
+  movq $'-', %rdx
+3: # skip modifying character
+
+  movq $0, %rdi
+  movq $0, %rsi
+
+  movl (%r15), %edi
+  movl 4(%r15), %esi
+
+  addl (%r10), %edi
+  addl 4(%r10), %esi
+
+  # putChar(screen->first.x + tmp->x, screen->first.y + tmp->y, character, color)
+  call putChar
+
+  incq %r11
+  cmpq $BLOCK_POINTS, %r11
+  jl 1b
+# end loop
+
+  movq %rbp, %rsp
+  popq %rbp
+
+  ret
 
 /**
  * Draw field on screen

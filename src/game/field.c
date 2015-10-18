@@ -77,38 +77,38 @@
 //     }
 //   }
 // }
-
-/**
- * params:
- *  field -- the field
- *  block -- the block to draw
- */
-void field_block_draw(field_t *field, block_t *block) {
-  assert(field && block);
-
-  screen_t *screen = &field->screen;
-  point_t block_point[BLOCK_POINTS];
-  block_to_points(screen, block_point, block);
-
-  for(int x = 0; x < BLOCK_POINTS; ++x) {
-    int8_t color = 0x27;
-
-    point_t *tmp = &block_point[x];
-
-    // if field occupied
-    if(field->field[tmp->y][tmp->x]) {
-      color = 0xC7; // red background
-    }
-
-    char b = '#';
-    if(block->dealloc) {
-      b = '-';
-    }
-
-    putChar(screen->first.x + tmp->x, screen->first.y + tmp->y, b, color);
-  }
-}
-
+// 
+// /**
+//  * params:
+//  *  field -- the field
+//  *  block -- the block to draw
+//  */
+// void field_block_draw(field_t *field, block_t *block) {
+//   assert(field && block);
+// 
+//   screen_t *screen = &field->screen;
+//   point_t block_point[BLOCK_POINTS];
+//   block_to_points(screen, block_point, block);
+// 
+//   for(int x = 0; x < BLOCK_POINTS; ++x) {
+//     int8_t color = 0x27;
+// 
+//     point_t *tmp = &block_point[x];
+// 
+//     // if field occupied
+//     if(field->field[tmp->y][tmp->x]) {
+//       color = 0xC7; // red background
+//     }
+// 
+//     char b = '#';
+//     if(block->dealloc) {
+//       b = '-';
+//     }
+// 
+//     putChar(screen->first.x + tmp->x, screen->first.y + tmp->y, b, color);
+//   }
+// }
+// 
 /**
  * merge the block with field.
  * params:
