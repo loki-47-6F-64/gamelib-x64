@@ -109,20 +109,21 @@
 //   }
 // }
 // 
-/**
- * merge the block with field.
- * params:
- *  field -- the field for merging
- *  block -- the block for merging
- */
-void field_block_merge(field_t *field, block_t *block) {
-  assert(field && block);
-
-  point_t block_point[BLOCK_POINTS];
-  block_to_points(&field->screen, block_point, block);
-
-  for(int x = 0; x < BLOCK_POINTS; ++x) {
-    field->field[block_point[x].y][block_point[x].x] = 1 - block->dealloc;
-  }
-
-}
+// /**
+//  * merge the block with field.
+//  * params:
+//  *  field -- the field for merging
+//  *  block -- the block for merging
+//  */
+// void field_block_merge(field_t *field, block_t *block) {
+//   assert(field && block);
+// 
+//   point_t block_point[BLOCK_POINTS];
+//   block_to_points(&field->screen, block_point, block);
+// 
+//   int32_t norm = 1 - block->dealloc;
+//   for(int x = 0; x < BLOCK_POINTS; ++x) {
+//     field->field[block_point[x].y][block_point[x].x] = norm;
+//   }
+// 
+// }

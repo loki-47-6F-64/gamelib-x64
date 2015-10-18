@@ -25,6 +25,66 @@
 .global field_block_draw
 
 /**
+ * merge the block with field.
+ * params:
+ *  (field_t*) field -- the field for merging
+ *  (block_t*) block -- the block for merging
+ */
+field_block_merge:
+  pushq %rbp
+  movq %rsp, %rbp
+
+  assert $0, %rdi, field_empty_1, jne
+  assert $0, %rsi, field_empty_2, jne
+
+  # init block_points
+  subq $8*BLOCK_POINTS, %rsp
+
+  pushq %r15
+  pushq %r14
+ 
+  movq %rdi, %r15 # field
+  movq %rsi, %r14 # block
+
+  # rdi is already at the correct value: &field->screen
+  lea -8*BLOCK_POINTS(%rbp), %rsi
+  movq %r14, %rdx
+  call block_to_points
+
+  movq $0, %r11 # init counter
+
+  movq $1, %rcx
+
+  # norm is complement of block->dealloc
+  subl SIZE_OF_BLOCK_T-4(%r14), %ecx # norm = 1 - block->dealloc
+1: # while counter < BLOCK_POINTS
+  lea -8*BLOCK_POINTS(%rbp, %r11, 8), %r10 # &block_point[counter]
+
+  movq $0, %r8
+  movq $0, %r9
+
+  movl (%r10), %r9d  # x
+  movl 4(%r10), %r8d # y
+
+  movq $0, %rdx
+  movq $FIELD_SIZE_X, %rax
+  mul %r8
+  addq %r9, %rax # rax = x + y*FIELD_SIZE_X
+
+  # field->field
+  movl %ecx, SIZE_OF_SCREEN_T(%r15, %rax, 4)
+
+  incq %r11
+  cmpq $BLOCK_POINTS, %r11
+  jl 1b
+# end loop
+
+  movq %rbp, %rsp
+  popq %rbp
+
+  ret
+
+/**
  * params:
  *  (field_t*) field -- the field
  *  (block_t*) block -- the block to draw
@@ -73,7 +133,7 @@ field_block_draw:
   movq $0xC7, %rcx
 2: # skip modifying color
 
-  cmpq $0, SIZE_OF_BLOCK_T-8(%r14) # block->dealloc
+  cmpl $0, SIZE_OF_BLOCK_T-4(%r14) # block->dealloc
   movq $'#', %rdx
   je 3f # if deallocation block
 
