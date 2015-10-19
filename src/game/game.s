@@ -561,6 +561,15 @@ game_init:
 # end loop
 
   movq $6*TICKS_PER_SEC, SIZE_OF_GAME_T-16+game
+
+  movq $0, %rdi
+  movq $0, %rsi
+  call screen_clear
+
+  # first draw game
+  movq $game, %rdi
+  call game_draw
+
   movq $STATE_GAME, game_state
 
   popq %r15
