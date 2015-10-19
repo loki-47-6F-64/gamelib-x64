@@ -100,6 +100,7 @@ gameLoop_switch:
   .quad menu_loop # handle menuplay
   .quad game_loop # handle gameplay
   .quad highscore_loop # display highscore
+  .quad game_over_loop # cutscene after game
   .quad new_highscore_loop # record new highscore
 .text
   call *%r11
@@ -125,6 +126,66 @@ highscore_loop:
 
   ret
  
+# After the game
+game_over_init:
+  pushq %rbp
+  movq %rsp, %rbp
+
+  movq $STATE_GAME_OVER, game_state
+
+  movq %rbp, %rsp
+  popq %rbp
+
+  ret
+
+game_over_loop:
+  pushq %rbp
+  movq %rsp, %rbp
+
+  subq $SIZE_OF_SCREEN_T, %rsp
+  lea -SIZE_OF_SCREEN_T(%rbp), %rdi  # screen_t*
+  movq $15, %rsi   # x
+  movq $7, %rdx    # y
+  movq $45, %rcx   # width
+  movq $10, %r8    # height
+  call screen_init
+
+.data
+game_over_rep_f:
+  .string "The application %ccrashed%c!"
+game_over_f:
+  .string "%c%n%n%n%n                 Game Over!"
+.text
+  movq $0, %rdi # default screen
+  movq $game_over_rep_f, %rsi
+  movq $0xC7, %rdx
+  movq $0x07, %rcx
+  call writef
+
+  lea -SIZE_OF_SCREEN_T(%rbp), %rdi
+  movq $0x10, %rsi
+  call screen_clear
+
+  lea -SIZE_OF_SCREEN_T(%rbp), %rdi
+  movq $game_over_f, %rsi
+  movq $0x1F, %rdx
+  call writef
+
+  call readKeyCode
+  
+  cmpq $KEY_CODE_ENT, %rax
+  jne 1f # return if not key enter
+
+  # game.score
+  movq game+SIZE_OF_GAME_T-8, %rdi
+  call new_highscore_init
+1: # return
+  movq %rbp, %rsp
+  popq %rbp
+
+  ret
+ 
+
 # Record the name and score of the player
 new_highscore_loop:
   pushq %rbp
@@ -347,9 +408,7 @@ game_loop:
   cmpq $0, SIZE_OF_GAME_T-16+game
   jne 9f
 
-  # game.score
-  movq game+SIZE_OF_GAME_T-8, %rdi
-  call new_highscore_init
+  call game_over_init
 
   jmp 10f # return
 9: # endif
