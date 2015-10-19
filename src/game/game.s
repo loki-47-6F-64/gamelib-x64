@@ -76,11 +76,11 @@ gameInit:
   movq $SCREEN_SIZE_Y, %r8 # height
   call screen_init
 
-  movq $0, %rdi # default screen
-  movq $0, %rsi # color black
-  call screen_clear
+#  movq $0, %rdi # default screen
+#  movq $0, %rsi # color black
+#  call screen_clear
 
-  call menu_init
+  call cutscene_init
   
   movq %rbp, %rsp
   popq %rbp
@@ -132,6 +132,37 @@ game_over_init:
   movq %rsp, %rbp
 
   movq $STATE_GAME_OVER, game_state
+
+  movq %rbp, %rsp
+  popq %rbp
+
+  ret
+
+# before the menu
+cutscene_init:
+  pushq %rbp
+  movq %rsp, %rbp
+
+  movq $0, %rdi
+  movq $0x10, %rsi
+  call screen_clear
+
+.data
+cutscene_f:
+  .ascii  "%cYou are the memory scheduler.%n"
+  .ascii  "It's your job to allocate memory for the application running on the kernel%n%n"
+  .ascii  "If you cannot allocate memory in a timely matter, the application will crash%n"
+  .ascii  "and you'll have failed the only task you were assigned%n%n%n"
+  .ascii  "Good luck >:)%n%n%n"
+  .string "Press enter to continue..."
+.text
+
+  movq $0, %rdi # default screen
+  movq $cutscene_f, %rsi
+  movq $0x1F, %rdx
+  call writef
+
+  movq $STATE_HIGHSCORE, game_state
 
   movq %rbp, %rsp
   popq %rbp
