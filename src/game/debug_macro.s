@@ -14,6 +14,7 @@
 .set KEY_CODE_3, 4
 
 .set KEY_CODE_ENT, 0x1C
+.set KEY_CODE_SPACE, 0x39
 
 .set KEY_CODE_AU, 72
 .set KEY_CODE_AD, 80

@@ -117,8 +117,13 @@ highscore_loop:
   call readKeyCode
   
   cmpq $KEY_CODE_ENT, %rax
-  jne 1f # return if not key enter
+  je 2f # return if not key enter
 
+  cmpq $KEY_CODE_SPACE, %rax
+  je 2f
+
+  jmp 1f
+2:
   call menu_init
 1: # return
   movq %rbp, %rsp
@@ -205,8 +210,13 @@ game_over_f:
   call readKeyCode
   
   cmpq $KEY_CODE_ENT, %rax
-  jne 1f # return if not key enter
+  je 2f # return if not key enter
 
+  cmpq $KEY_CODE_SPACE, %rax
+  je 2f
+
+  jmp 1f
+2:
   # game.score
   movq game+SIZE_OF_GAME_T-8, %rdi
   call new_highscore_init
@@ -239,6 +249,9 @@ new_highscore_loop:
   je 2f
 
   cmpq $KEY_CODE_ENT, %rax
+  je 3f
+
+  cmpq $KEY_CODE_SPACE, %rax
   je 3f
 
   jmp 4f
@@ -369,6 +382,9 @@ game_loop:
   je 5f
 
   cmpq $KEY_CODE_ENT, %rax
+  je 6f
+
+  cmpq $KEY_CODE_SPACE, %rax
   je 6f
 
   jmp 7f
