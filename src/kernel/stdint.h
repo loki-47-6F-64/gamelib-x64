@@ -21,6 +21,8 @@
 
 #ifndef _STDINT_H
 #define _STDINT_H	1
+
+#define NULL ((void*)0)
 /* Exact integral types.  */
 
 /* Signed.  */

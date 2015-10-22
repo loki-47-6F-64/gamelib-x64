@@ -27,10 +27,10 @@ endif
 
 obj_boot   = out/boot.o
 obj_kernel = out/kernel.o
-obj_game   = out/game.o out/main.o
+obj_game   = out/game.o
 
 ASFLAGS = -g $(PASS_MACRO_AS)
-CFLAGS  = $(PASS_MACRO_CC) -I$(PWD) -m64 -nostdlib -c -fno-omit-frame-pointer -ffreestanding -mcmodel=large -mno-red-zone -mno-mmx -mno-sse -mno-sse2 -mno-sse3 $(NDEBUG) $(NRELEASE) -Wall -Wextra -W
+CFLAGS  = $(PASS_MACRO_CC) -I$(PWD) -std=c11 -m64 -nostdlib -c -fno-omit-frame-pointer -ffreestanding -mcmodel=large -mno-red-zone -mno-mmx -mno-sse -mno-sse2 -mno-sse3 $(NDEBUG) $(NRELEASE) -Wall -Wextra -W
 
 
 all: out/kernel_symbols out/bootloader out/kernel Makefile
@@ -46,7 +46,7 @@ out/kernel: $(obj_kernel) $(obj_game) src/kernel/link_kernel.ld | HD_img
 # GDB needs a specific format in order to read the symbols,
 # unfortunately the kernel will not boot properly with that format, thus
 # a dummy kernel is required
-out/kernel_symbols: $(obj_kernel) $(obj_game) src/kernel/link_kernel_symbols.ld | HD_img
+out/kernel_symbols: $(obj_kernel) $(obj_game) src/kernel/link_kernel_symbols.ld 
 	$(LD) -nostdlib -T src/kernel/link_kernel_symbols.ld -o $@ $(obj_kernel) $(obj_game)
 
 out/boot.o: src/bootloader/*.s | out
@@ -57,9 +57,6 @@ out/kernel.o: src/kernel/*.s | out
 
 out/game.o: src/game/*.s | out
 	$(AS) $(ASFLAGS) src/game/*.s -o $@
-
-out/main.o: src/game/main.c | out
-	$(CC) $(CFLAGS) src/game/main.c -o $@ 
 
 HD_img:
 	dd if=/dev/zero of=$@ count=512
